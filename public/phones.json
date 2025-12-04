@@ -1,0 +1,98 @@
+[
+  {
+    "_id": 1,
+    "name": "iPhone 11 Pro Max",
+    "description": "The iPhone 11 Pro Max is a 2019 flagship smartphone with triple camera system and Super Retina XDR display.",
+    "category": "iphone",
+    "upcoming": false,
+    "latest": true,
+    "recommend": true,
+    "coverImage": "apple-iphone-11.jpg",
+    "price": 899.99,
+    "year": 2019
+  },
+  {
+    "_id": 2,
+    "name": "iPhone 11",
+    "description": "The iPhone 11 is a 2019 smartphone featuring dual cameras and all-day battery life.",
+    "category": "iphone",
+    "upcoming": false,
+    "latest": false,
+    "recommend": true,
+    "coverImage": "apple-iphone-11.jpg",
+    "price": 699.99,
+    "year": 2019
+  },
+  {
+    "_id": 3,
+    "name": "iPhone 12",
+    "description": "The iPhone 12 is a 2020 smartphone with 5G, A14 Bionic chip, and Ceramic Shield.",
+    "category": "iphone",
+    "upcoming": false,
+    "latest": false,
+    "recommend": true,
+    "coverImage": "apple-iphone-12.jpg",
+    "price": 799.99,
+    "year": 2020
+  },
+  {
+    "_id": 4,
+    "name": "iPhone 13",
+    "description": "The iPhone 13 is a 2021 smartphone with advanced dual-camera system and cinematic mode.",
+    "category": "iphone",
+    "upcoming": false,
+    "latest": false,
+    "recommend": true,
+    "coverImage": "apple-iphone-13.jpg",
+    "price": 899.99,
+    "year": 2021
+  },
+  {
+    "_id": 5,
+    "name": "iPhone 13 Pro",
+    "description": "The iPhone 13 Pro is a 2021 flagship with ProMotion display, telephoto lens, and pro camera features.",
+    "category": "iphone",
+    "upcoming": false,
+    "latest": false,
+    "recommend": true,
+    "coverImage": "apple-iphone-13-pro.jpg",
+    "price": 1099.99,
+    "year": 2021
+  },
+  {
+    "_id": 6,
+    "name": "Samsung Galaxy S23",
+    "description": "Premium Android flagship with advanced camera system and stunning AMOLED display.",
+    "category": "samsung",
+    "upcoming": false,
+    "latest": true,
+    "recommend": true,
+    "coverImage": "samsung-galaxy-s23.jpg",
+    "price": 799.99,
+    "year": 2023
+  },
+  {
+    "_id": 7,
+    "name": "Samsung Galaxy S23 Ultra",
+    "description": "Ultimate Samsung flagship with S Pen, 200MP camera, and premium performance.",
+    "category": "samsung",
+    "upcoming": false,
+    "latest": true,
+    "recommend": true,
+    "coverImage": "samsung-galaxy-s23-ultra.jpg",
+    "price": 1199.99,
+    "year": 2023
+  },
+  {
+    "_id": 8,
+    "name": "OnePlus 11",
+    "description": "Fast and powerful Android phone with Hasselblad camera and rapid charging technology.",
+    "category": "oneplus",
+    "upcoming": true,
+    "latest": true,
+    "recommend": true,
+    "coverImage": "oneplus-11.jpg",
+    "price": 699.99,
+    "year": 2023
+  }
+]
