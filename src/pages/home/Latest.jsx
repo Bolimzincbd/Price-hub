@@ -9,11 +9,8 @@ import "swiper/css";
 import "swiper/css/pagination";
 import "swiper/css/navigation";
 
-const categories = ["iphone", "samsung", "oneplus"];
-
 const Latest = () => {
   const [phones, setPhones] = useState([]);
-  const [selectedCategory, setSelectedCategory] = useState("iphone");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -29,43 +26,27 @@ const Latest = () => {
       });
   }, []);
 
-  const filteredPhones =
-    selectedCategory === "Phone finder"
-      ? phones
-      : phones.filter(
-          (phone) => phone.category === selectedCategory.toLowerCase()
-        );
-
-  console.log(filteredPhones);
+  const latestPhones = phones.filter(phone => phone.latest === true);
 
   if (loading) {
-    return <div className="py-16 text-center">Loading...</div>;
+    return <div className="py-16 text-center text-[#536471]">Loading...</div>;
   }
 
   return (
-    <div className="py-16">
-      <h2 className="text-3xl font-semibold mb-6">Latest smartphone</h2>
-
-      {/* Optional: Category filter buttons */}
-      <div className="mb-6 flex gap-4">
-        {categories.map((category) => (
-          <button
-            key={category}
-            onClick={() => setSelectedCategory(category)}
-            className={`px-4 py-2 rounded ${
-              selectedCategory === category
-                ? "bg-blue-600 text-white"
-                : "bg-gray-200"
-            }`}
-          >
-            {category}
-          </button>
-        ))}
+    <div className="py-10 px-6">
+      <div className="flex justify-between items-center mb-6">
+        <div className="text-2xl font-bold text-[#0f1419] flex items-center gap-2">
+          Latest Products 
+          <span className="bg-[#dbeafe] text-[#1e40af] px-3 py-1 rounded-full text-xs font-semibold">NEW</span>
+        </div>
+        <div className="text-[#536471] hover:text-[#667eea] cursor-pointer transition-colors font-medium">
+          View All →
+        </div>
       </div>
 
-      {filteredPhones.length === 0 ? (
-        <p className="text-center text-gray-600">
-          No phones found in this category
+      {latestPhones.length === 0 ? (
+        <p className="text-center text-[#536471]">
+          No latest phones found
         </p>
       ) : (
         <Swiper
@@ -73,38 +54,23 @@ const Latest = () => {
           spaceBetween={30}
           navigation={true}
           breakpoints={{
-            640: {
-              slidesPerView: 1,
-              spaceBetween: 20,
-            },
-            768: {
-              slidesPerView: 2,
-              spaceBetween: 40,
-            },
-            1024: {
-              slidesPerView: 2,
-              spaceBetween: 50,
-            },
-            1180: {
-              slidesPerView: 3,
-              spaceBetween: 50,
-            },
+            640: { slidesPerView: 1, spaceBetween: 20 },
+            768: { slidesPerView: 2, spaceBetween: 40 },
+            1024: { slidesPerView: 3, spaceBetween: 30 },
+            1280: { slidesPerView: 4, spaceBetween: 30 },
           }}
           modules={[Pagination, Navigation]}
-          className="mySwiper"
+          className="mySwiper !pb-10"
         >
-          {filteredPhones.map((phone, index) => {
-            if (phone.latest === true) {
-              return (
-                <SwiperSlide key={index}>
-                  <Phonecard phone={phone} />
-                </SwiperSlide>
-              );
-            }
-          })}
+          {latestPhones.map((phone) => (
+            <SwiperSlide key={phone._id}>
+              <Phonecard phone={phone} />
+            </SwiperSlide>
+          ))}
         </Swiper>
       )}
     </div>
   );
 };
+
 export default Latest;

@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 
 const Navbar = () => {
   return (
-    <header className="bg-sky-800   ">
+    <header className="bg-gradient-to-br from-[#667eea] to-[#a251b0] shadow-md">
       <nav className=" text-white flex justify-between items-center max-w-screen-2xl mx-auto px-4 py-6">
         <div className="shrink-0 flex items-center text-2xl font-bold ">
           PhoneHub
