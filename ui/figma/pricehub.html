@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PriceHub - Figma Design System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #f5f7fa;
+            padding: 20px;
+        }
+
+        .design-container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        .design-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(102, 126, 234, 0.3);
+        }
+
+        .design-header h1 {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+
+        .design-header p {
+            font-size: 18px;
+            opacity: 0.9;
+        }
+
+        .screen-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .screen-frame {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .screen-frame:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+        }
+
+        .screen-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #667eea;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .screen-content {
+            background: #fafbfc;
+            border: 2px solid #e1e8ed;
+            border-radius: 12px;
+            min-height: 600px;
+            overflow: hidden;
+        }
+
+        /* Navigation Bar */
+        .navbar {
+            background: white;
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #e1e8ed;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 24px;
+            font-size: 14px;
+        }
+
+        .nav-link {
+            color: #536471;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .nav-link:hover {
+            color: #667eea;
+        }
+
+        .nav-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 8px 20px;
+            border-radius: 8px;
+            border: none;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 60px 24px;
+            text-align: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .hero h1 {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        .hero p {
+            font-size: 18px;
+            opacity: 0.9;
+            margin-bottom: 32px;
+        }
+
+        .search-bar {
+            background: white;
+            padding: 8px;
+            border-radius: 50px;
+            display: flex;
+            max-width: 600px;
+            margin: 0 auto;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+        }
+
+        .search-bar input {
+            flex: 1;
+            border: none;
+            padding: 12px 20px;
+            font-size: 16px;
+            outline: none;
+        }
+
+        .search-bar button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 32px;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        /* Product Cards */
+        .products-section {
+            padding: 40px 24px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .section-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #0f1419;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .product-card {
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            border: 1px solid #e1e8ed;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .product-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+            border-color: #667eea;
+        }
+
+        .product-image {
+            width: 100%;
+            height: 180px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 12px;
+            font-size: 60px;
+        }
+
+        .product-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #0f1419;
+            margin-bottom: 8px;
+        }
+
+        .product-price {
+            font-size: 20px;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 4px;
+        }
+
+        .product-stores {
+            font-size: 12px;
+            color: #536471;
+        }
+
+        .product-rating {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            margin-top: 8px;
+            font-size: 14px;
+        }
+
+        .stars {
+            color: #fbbf24;
+        }
+
+        /* Filters */
+        .filters-sidebar {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            border: 1px solid #e1e8ed;
+        }
+
+        .filter-group {
+            margin-bottom: 24px;
+        }
+
+        .filter-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #0f1419;
+            margin-bottom: 12px;
+        }
+
+        .filter-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 0;
+            cursor: pointer;
+        }
+
+        .checkbox {
+            width: 18px;
+            height: 18px;
+            border: 2px solid #d1d5db;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .checkbox.checked {
+            background: #667eea;
+            border-color: #667eea;
+            color: white;
+        }
+
+        /* Product Detail */
+        .product-detail {
+            padding: 40px 24px;
+        }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+        }
+
+        .detail-image {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 16px;
+            height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 120px;
+        }
+
+        .detail-info h1 {
+            font-size: 32px;
+            margin-bottom: 16px;
+        }
+
+        .detail-price {
+            font-size: 36px;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 24px;
+        }
+
+        .specs-table {
+            background: white;
+            border-radius: 12px;
+            border: 1px solid #e1e8ed;
+            margin-top: 24px;
+        }
+
+        .spec-row {
+            display: flex;
+            padding: 16px;
+            border-bottom: 1px solid #e1e8ed;
+        }
+
+        .spec-row:last-child {
+            border-bottom: none;
+        }
+
+        .spec-label {
+            flex: 1;
+            font-weight: 600;
+            color: #536471;
+        }
+
+        .spec-value {
+            flex: 2;
+            color: #0f1419;
+        }
+
+        .stores-list {
+            margin-top: 24px;
+        }
+
+        .store-item {
+            background: white;
+            padding: 16px;
+            border-radius: 12px;
+            border: 1px solid #e1e8ed;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .store-name {
+            font-weight: 600;
+            color: #0f1419;
+        }
+
+        .store-price {
+            font-size: 20px;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        /* Compare Section */
+        .compare-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            padding: 24px;
+        }
+
+        .compare-card {
+            background: white;
+            border-radius: 12px;
+            border: 2px dashed #d1d5db;
+            padding: 24px;
+            text-align: center;
+            min-height: 400px;
+        }
+
+        .compare-card.filled {
+            border: 2px solid #667eea;
+        }
+
+        /* Admin Dashboard */
+        .admin-sidebar {
+            background: #1f2937;
+            color: white;
+            padding: 24px;
+            min-height: 600px;
+        }
+
+        .admin-menu-item {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: background  0.2s;
+        }
+
+        .admin-menu-item:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .admin-menu-item.active {
+            background: #667eea;
+        }
+
+        .admin-content {
+            padding: 24px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 32px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            border: 1px solid #e1e8ed;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: #536471;
+        }
+
+        .data-table {
+            background: white;
+            border-radius: 12px;
+            border: 1px solid #e1e8ed;
+            overflow: hidden;
+        }
+
+        .table-header {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            padding: 16px;
+            background: #f9fafb;
+            font-weight: 600;
+            color: #536471;
+            font-size: 14px;
+        }
+
+        .table-row {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            padding: 16px;
+            border-top: 1px solid #e1e8ed;
+            align-items: center;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .icon-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            border: 1px solid #e1e8ed;
+            background: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .icon-btn:hover {
+            background: #f9fafb;
+            border-color: #667eea;
+        }
+
+        /* Login Page */
+        .login-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 600px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .login-box {
+            background: white;
+            padding: 48px;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .login-title {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            text-align: center;
+        }
+
+        .login-subtitle {
+            color: #536471;
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #0f1419;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e1e8ed;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.2s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .reviews-section {
+            padding: 24px;
+        }
+
+        .review-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid #e1e8ed;
+            margin-bottom: 16px;
+        }
+
+        .review-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .reviewer-name {
+            font-weight: 600;
+            color: #0f1419;
+        }
+
+        .review-date {
+            font-size: 12px;
+            color: #536471;
+        }
+
+        .review-text {
+            color: #536471;
+            line-height: 1.6;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge-new {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .badge-recommended {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .badge-upcoming {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .screen-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .detail-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .compare-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .tab-navigation {
+            display: flex;
+            gap: 24px;
+            border-bottom: 2px solid #e1e8ed;
+            margin-bottom: 24px;
+            padding: 0 24px;
+        }
+
+        .tab {
+            padding: 12px 0;
+            font-weight: 600;
+            color: #536471;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2px;
+            transition: all 0.2s;
+        }
+
+        .tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+
+        .blog-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid #e1e8ed;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .blog-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+        }
+
+        .blog-image {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .blog-content {
+            padding: 20px;
+        }
+
+        .blog-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #0f1419;
+            margin-bottom: 8px;
+        }
+
+        .blog-excerpt {
+            color: #536471;
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 16px;
+        }
+
+        .blog-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            color: #536471;
+        }
+    </style>
+</head>
+<body>
+    <div class="design-container">
+        <div class="design-header">
+            <h1>📱 PriceHub Design System</h1>
+            <p>Complete Figma Design for Phone Price Comparison Platform</p>
+        </div>
+
+        <div class="screen-grid">
+            <!-- Screen 1: Homepage -->
+            <div class="screen-frame">
+                <div class="screen-label">01 - Homepage</div>
+                <div class="screen-content">
+                    <div class="navbar">
+                        <div class="logo">PriceHub</div>
+                        <div class="nav-links">
+                            <div class="nav-link">Phones</div>
+                            <div class="nav-link">Compare</div>
+                            <div class="nav-link">Reviews</div>
+                            <div class="nav-link">Blog</div>
+                        </div>
+                        <div class="nav-actions">
+                            <button class="btn btn-secondary">Login</button>
+                            <button class="btn btn-primary">Sign Up</button>
+                        </div>
+                    </div>
+                    <div class="hero">
+                        <h1>Find the Best Phone Prices</h1>
+                        <p>Compare prices from multiple stores instantly</p>
+                        <div class="search-bar">
+                            <input type="text" placeholder="Search for phones...">
+                            <button>Search</button>
+                        </div>
+                    </div>
+                    <div class="products-section">
+                        <div class="section-header">
+                            <div class="section-title">Latest Products <span class="badge badge-new">NEW</span></div>
+                            <div class="nav-link">View All →</div>
+                        </div>
+                        <div class="products-grid">
+                            <div class="product-card">
+                                <div class="product-image">📱</div>
+                                <div class="product-name">iPhone 15 Pro</div>
+                                <div class="product-price">$999</div>
+                                <div class="product-stores">From 8 stores</div>
+                                <div class="product-rating">
+                                    <span class="stars">★★★★★</span>
+                                    <span>4.8</span>
+                                </div>
+                            </div>
+                            <div class="product-card">
+                                <div class="product-image">📱</div>
+                                <div class="product-name">Samsung S24 Ultra</div>
+                                <div class="product-price">$1,199</div>
+                                <div class="product-stores">From 6 stores</div>
+                                <div class="product-rating">
+                                    <span class="stars">★★★★★</span>
+                                    <span>4.7</span>
+                                </div>
+                            </div>
+                            <div class="product-card">
+                                <div class="product-image">📱</div>
+                                <div class="product-name">Google Pixel 8</div>
+                                <div class="product-price">$699</div>
+                                <div class="product-stores">From 5 stores</div>
+                                <div class="product-rating">
+                                    <span class="stars">★★★★☆</span>
+                                    <span>4.6</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Screen 2: Search & Filter -->
+            <div class="screen-frame">
+                <div class="screen-label">02 - Search & Filter</div>
+                <div class="screen-content">
+                    <div class="navbar">
+                        <div class="logo">PriceHub</div>
+                        <div class="nav-links">
+                            <div class="nav-link">Phones</div>
+                            <div class="nav-link">Compare</div>
+                            <div class="nav-link">Reviews</div>
+                            <div class="nav-link">Blog</div>
+                        </div>
+                    </div>
+                    <div style="padding: 24px;">
+                        <div style="display: grid; grid-template-columns: 250px 1fr; gap: 24px;">
+                            <div class="filters-sidebar">
+                                <div class="filter-group">
+                                    <div class="filter-title">Brand</div>
+                                    <div class="filter-option">
+                                        <div class="checkbox checked">✓</div>
+                                        <span>Apple (45)</span>
+                                    </div>
+                                    <div class="filter-option">
+                                        <div class="checkbox">✓</div>
+                                        <span>Samsung (38)</span>
+                                    </div>
+                                    <div class="filter-option">
+                                        <div class="checkbox">✓</div>
+                                        <span>Google (12)</span>
+                                    </div>
+                                    <div class="filter-option">
+                                        <div class="checkbox">✓</div>
+                                        <span>OnePlus (15)</span>
+                                    </div>
+                                </div>
+                                <div class="filter-group">
+                                    <div class="filter-title">Price Range</div>
+                                    <div style="padding: 16px 0;">
+                                        <input type="range" style="width: 100%;">
+                                        <div style="display: flex; justify-content: space-between; margin-top: 8px; font-size: 14px; color: #536471;">
+                                            <span>$0</span>
+                                            <span>$2000+</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="filter-group">
+                                    <div class="filter-title">RAM</div>
+                                    <div class="filter-option">
+                                        <div class="checkbox">✓</div>
+                                        <span>4GB (8)</span>
+                                    </div>
+                                    <div class="filter-option">
+                                        <div class="checkbox checked">✓</div>
+                                        <span>8GB (24)</span>
+                                    </div>
+                                    <div class="filter-option">
+                                        <div class="checkbox">✓</div>
+                                        <span>12GB+ (16)</span>
+                                    </div>
+                                </div>
+                                <div class="filter-group">
+                                    <div class="filter-title">Storage</div>
+                                    <div class="filter-option">
+                                        <div class="checkbox">✓</div>
+                                        <span>64GB (3)</span>
+                                    </div>
+                                    <div class="filter-option">
+                                        <div class="checkbox">✓</div>
+                                        <span>128GB (15)</span>
+                                    </div>
+                                    <div class="filter-option">
+                                        <div class="checkbox checked">✓</div>
+                                        <span>256GB (22)</span>
+                                    </div>
+                                </div>
+                                <button class="btn btn-primary" style="width: 100%; margin-top: 16px;">Apply Filters</button>
+                            </div>
+                            <div>
+                                <div style="margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center;">
+                                    <div style="font-size: 18px; font-weight: 600;">48 Results Found</div>
+                                    <select style="padding: 8px 16px; border: 2px solid #e1e8ed; border-radius: 8px;">
+                                        <option>Sort by: Price Low to High</option>
+                                        <option>Sort by: Price High to Low</option>
+                                        <option>Sort by: Newest</option>
+                                        <option>Sort by: Most Popular</option>
+                                    </select>
+                                </div>
+                                <div class="products-grid">
+                                    <div class="product-card">
+                                        <div class="product-image">📱</div>
+                                        <div class="product-name">iPhone 15 Pro</div>
+                                        <div class="product-price">$999</div>
+                                        <div class="product-stores">From 8 stores</div>
+                                        <div class="product-rating">
+                                            <span class="stars">★★★★★</span>
+                                            <span>4.8</span>
+                                        </div>
+                                    </div>
+                                    <div class="product-card">
+                                        <div class="product-image">📱</div>
+                                        <div class="product-name">iPhone 14 Pro</div>
+                                        <div class="product-price">$899</div>
+                                        <div class="product-stores">From 12 stores</div>
+                                        <div class="product-rating">
+                                            <span class="stars">★★★★★</span>
+                                            <span>4.7</span>
+                                        </div>
+                                    </div>
+                                    <div class="product-card">
+                                        <div class="product-image">📱</div>
+                                        <div class="product-name">iPhone 13 Pro</div>
+                                        <div class="product-price">$799</div>
+                                        <div class="product-stores">From 10 stores</div>
+                                        <div class="product-rating">
+                                            <span class="stars">★★★★☆</span>
+                                            <span>4.6</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Screen 3: Product Detail -->
+            <div class="screen-frame">
+                <div class="screen-label">03 - Product Detail</div>
+                <div class="screen-content">
+                    <div class="navbar">
+                        <div class="logo">PriceHub</div>
+                        <div class="nav-links">
+                            <div class="nav-link">Phones</div>
+                            <div class="nav-link">Compare</div>
+                            <div class="nav-link">Reviews</div>
+                        </div>
+                    </div>
+                    <div class="product-detail">
+                        <div class="detail-grid">
+                            <div>
+                                <div class="detail-image">📱</div>
+                            </div>
+                            <div class="detail-info">
+                                <h1>iPhone 15 Pro Max</h1>
+                                <div class="product-rating" style="margin-bottom: 16px;">
+                                    <span class="stars" style="font-size: 18px;">★★★★★</span>
+                                    <span style="font-size: 16px;">4.8 (2,456 reviews)</span>
+                                </div>
+                                <div class="detail-price">Starting at $999</div>
+                                <p style="color: #536471; line-height: 1.6; margin-bottom: 24px;">
+                                    The ultimate iPhone with titanium design
