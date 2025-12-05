@@ -9,7 +9,26 @@
     "recommend": true,
     "coverImage": "apple-iphone-11.jpg",
     "price": 899.99,
-    "year": 2019
+    "year": 2019,
+    "rating": 4.8,
+    "reviewCount": 120,
+    "specs": {
+      "display": "6.5\" Super Retina XDR OLED",
+      "processor": "A13 Bionic chip",
+      "ram": "4GB",
+      "storage": "64GB / 256GB / 512GB",
+      "battery": "3969 mAh",
+      "camera": "12MP Triple (Ultra Wide, Wide, Telephoto)"
+    },
+    "reviews": [
+      { "user": "Sarah J.", "rating": 5, "comment": "Still the best battery life I have ever had on an iPhone!" },
+      { "user": "Mike T.", "rating": 4, "comment": "Great camera, but a bit heavy." }
+    ],
+    "stores": [
+      { "name": "Apple Store", "price": 899.99, "url": "#" },
+      { "name": "Amazon", "price": 870.00, "url": "#" },
+      { "name": "Best Buy", "price": 899.99, "url": "#" }
+    ]
   },
   {
     "_id": 2,
@@ -21,7 +40,24 @@
     "recommend": true,
     "coverImage": "apple-iphone-11.jpg",
     "price": 699.99,
-    "year": 2019
+    "year": 2019,
+    "rating": 4.7,
+    "reviewCount": 215,
+    "specs": {
+      "display": "6.1\" Liquid Retina HD",
+      "processor": "A13 Bionic chip",
+      "ram": "4GB",
+      "storage": "64GB / 128GB / 256GB",
+      "battery": "3110 mAh",
+      "camera": "12MP Dual (Ultra Wide, Wide)"
+    },
+    "reviews": [
+      { "user": "Alex R.", "rating": 5, "comment": "Perfect value for money." }
+    ],
+    "stores": [
+      { "name": "Apple Store", "price": 699.99, "url": "#" },
+      { "name": "Walmart", "price": 649.00, "url": "#" }
+    ]
   },
   {
     "_id": 3,
@@ -33,7 +69,24 @@
     "recommend": true,
     "coverImage": "apple-iphone-12.jpg",
     "price": 799.99,
-    "year": 2020
+    "year": 2020,
+    "rating": 4.8,
+    "reviewCount": 180,
+    "specs": {
+      "display": "6.1\" Super Retina XDR",
+      "processor": "A14 Bionic chip",
+      "ram": "4GB",
+      "storage": "64GB / 128GB / 256GB",
+      "battery": "2815 mAh",
+      "camera": "12MP Dual system"
+    },
+    "reviews": [
+      { "user": "Emily W.", "rating": 5, "comment": "The flat edges design is beautiful." }
+    ],
+    "stores": [
+      { "name": "Apple Store", "price": 799.99, "url": "#" },
+      { "name": "Target", "price": 799.99, "url": "#" }
+    ]
   },
   {
     "_id": 4,
@@ -45,7 +98,23 @@
     "recommend": true,
     "coverImage": "apple-iphone-13.jpg",
     "price": 899.99,
-    "year": 2021
+    "year": 2021,
+    "rating": 4.9,
+    "reviewCount": 300,
+    "specs": {
+      "display": "6.1\" Super Retina XDR",
+      "processor": "A15 Bionic chip",
+      "ram": "4GB",
+      "storage": "128GB / 256GB / 512GB",
+      "battery": "3240 mAh",
+      "camera": "12MP Dual with Sensor-shift OIS"
+    },
+    "reviews": [
+        { "user": "Chris P.", "rating": 5, "comment": "Cinematic mode is a game changer!" }
+    ],
+    "stores": [
+        { "name": "Apple Store", "price": 899.99, "url": "#" }
+    ]
   },
   {
     "_id": 5,
@@ -57,7 +126,21 @@
     "recommend": true,
     "coverImage": "apple-iphone-13-pro.jpg",
     "price": 1099.99,
-    "year": 2021
+    "year": 2021,
+    "rating": 4.9,
+    "reviewCount": 150,
+    "specs": {
+      "display": "6.1\" Super Retina XDR with ProMotion",
+      "processor": "A15 Bionic chip",
+      "ram": "6GB",
+      "storage": "128GB / 256GB / 512GB / 1TB",
+      "battery": "3095 mAh",
+      "camera": "12MP Pro Camera System"
+    },
+    "reviews": [],
+    "stores": [
+        { "name": "Amazon", "price": 1050.00, "url": "#" }
+    ]
   },
   {
     "_id": 6,
@@ -69,7 +152,23 @@
     "recommend": true,
     "coverImage": "samsung-galaxy-s23.jpg",
     "price": 799.99,
-    "year": 2023
+    "year": 2023,
+    "rating": 4.7,
+    "reviewCount": 95,
+    "specs": {
+      "display": "6.1\" Dynamic AMOLED 2X",
+      "processor": "Snapdragon 8 Gen 2",
+      "ram": "8GB",
+      "storage": "128GB / 256GB",
+      "battery": "3900 mAh",
+      "camera": "50MP Triple Camera"
+    },
+    "reviews": [
+        { "user": "Jordan", "rating": 5, "comment": "Finally a compact phone with great power." }
+    ],
+    "stores": [
+        { "name": "Samsung Store", "price": 799.99, "url": "#" }
+    ]
   },
   {
     "_id": 7,
@@ -81,7 +180,24 @@
     "recommend": true,
     "coverImage": "samsung-galaxy-s23-ultra.jpg",
     "price": 1199.99,
-    "year": 2023
+    "year": 2023,
+    "rating": 4.9,
+    "reviewCount": 320,
+    "specs": {
+      "display": "6.8\" Dynamic AMOLED 2X",
+      "processor": "Snapdragon 8 Gen 2",
+      "ram": "8GB / 12GB",
+      "storage": "256GB / 512GB / 1TB",
+      "battery": "5000 mAh",
+      "camera": "200MP Quad Camera"
+    },
+    "reviews": [
+        { "user": "TechGuru", "rating": 5, "comment": "The zoom on this camera is insane." }
+    ],
+    "stores": [
+        { "name": "Samsung Store", "price": 1199.99, "url": "#" },
+        { "name": "Best Buy", "price": 1199.99, "url": "#" }
+    ]
   },
   {
     "_id": 8,
@@ -93,6 +209,22 @@
     "recommend": true,
     "coverImage": "oneplus-11.jpg",
     "price": 699.99,
-    "year": 2023
+    "year": 2023,
+    "rating": 4.6,
+    "reviewCount": 85,
+    "specs": {
+      "display": "6.7\" AMOLED with LTPO 3.0",
+      "processor": "Snapdragon 8 Gen 2",
+      "ram": "8GB / 16GB",
+      "storage": "128GB / 256GB",
+      "battery": "5000 mAh",
+      "camera": "50MP Triple (Hasselblad)"
+    },
+    "reviews": [
+        { "user": "OnePlusFan", "rating": 4, "comment": "Super fast charging!" }
+    ],
+    "stores": [
+        { "name": "OnePlus Store", "price": 699.99, "url": "#" }
+    ]
   }
 ]
