@@ -1,7 +1,8 @@
+/* src/index.css */
 @import "tailwindcss";
 
-* {
-  box-sizing: border-box;
-  font-family: sans-serif;
-  
+@layer base {
+  body {
+    @apply antialiased text-gray-900 bg-gray-50;
+  }
 }

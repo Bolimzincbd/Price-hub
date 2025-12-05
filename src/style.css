@@ -1,44 +1,29 @@
-#app {
-  height: 100%;
-}
+/* src/style.css */
+
+/* Remove the rigid height constraints that break scrolling/zooming */
 html,
 body {
-  position: relative;
-  height: 100%;
-}
-
-body {
-  background: #000;
-  font-family:
-    Helvetica Neue,
-    Helvetica,
-    Arial,
-    sans-serif;
-  font-size: 14px;
-  color: #fff;
+  width: 100%;
+  overflow-x: hidden; /* Prevents horizontal scrolling */
   margin: 0;
   padding: 0;
+  background-color: #f8f9fa; /* Light background to match your design */
+  color: #333;
 }
 
+#app {
+  min-height: 100vh; /* Allow app to grow with content */
+}
+
+/* Keep Swiper styles if you are using them */
 .swiper {
   width: 100%;
   height: 100%;
 }
 
 .swiper-slide {
-  text-align: center;
-  font-size: 18px;
-  background: #444;
-
-  /* Center slide text vertically */
+  /* Removed fixed background/text alignment to let your React components control the style */
   display: flex;
   justify-content: center;
   align-items: center;
-}
-
-.swiper-slide img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
 }
