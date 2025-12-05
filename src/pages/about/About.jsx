@@ -2,10 +2,10 @@ import React from "react";
 
 const About = () => {
   return (
-    <div className="py-12 px-4 max-w-screen-xl mx-auto font-sans">
+    <div className="py-12 px-4 max-w-7xl mx-auto font-sans">
       {/* Hero Section */}
       <div className="text-center mb-20 animate-fade-in-up">
-        <h1 className="text-4xl md:text-6xl font-extrabold bg-gradient-to-r from-[#667eea] to-[#764ba2] bg-clip-text text-transparent mb-6 tracking-tight">
+        <h1 className="text-4xl md:text-6xl font-extrabold bg-linear-to-r from-[#667eea] to-[#764ba2] bg-clip-text text-transparent mb-6 tracking-tight">
           About PriceHub
         </h1>
         <p className="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
@@ -30,7 +30,7 @@ const About = () => {
       </div>
 
       {/* Mission Section */}
-      <div className="bg-gradient-to-br from-[#667eea] to-[#764ba2] rounded-3xl p-8 md:p-16 text-white flex flex-col md:flex-row items-center gap-12 shadow-2xl overflow-hidden relative">
+      <div className="bg-linear-to-br from-[#667eea] to-[#764ba2] rounded-3xl p-8 md:p-16 text-white flex flex-col md:flex-row items-center gap-12 shadow-2xl overflow-hidden relative">
         {/* Background Pattern */}
         <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -mr-16 -mt-16"></div>
         
@@ -43,7 +43,7 @@ const About = () => {
         </div>
         <div className="flex-1 flex justify-center relative z-10">
            <div className="w-full max-w-sm bg-white/10 backdrop-blur-md rounded-2xl p-8 border border-white/20 shadow-inner transform rotate-3 hover:rotate-0 transition-transform duration-500">
-              <div className="h-48 bg-gradient-to-br from-white/20 to-white/5 rounded-xl flex items-center justify-center text-6xl shadow-sm">
+              <div className="h-48 bg-linear-to-br from-white/20 to-white/5 rounded-xl flex items-center justify-center text-6xl shadow-sm">
                 🚀
               </div>
            </div>

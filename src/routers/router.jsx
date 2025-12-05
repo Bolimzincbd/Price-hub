@@ -4,6 +4,7 @@ import Home from "../pages/home/Home";
 import About from "../pages/about/About"
 import Compare from "../pages/compare/Compare";
 import Login from "../pages/UI/Login";
+import PhoneDetail from "../pages/phones/PhoneDetail"; // Import the new component
 
 const router = createBrowserRouter([
   {
@@ -25,6 +26,10 @@ const router = createBrowserRouter([
       {
         path: "/login",
         element: <Login/>
+      },
+      {
+        path: "/phones/:id",  // Dynamic Route for Phone Details
+        element: <PhoneDetail />
       }
     ],
   },

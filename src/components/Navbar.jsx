@@ -4,7 +4,7 @@ import { FaSearch, FaUser } from "react-icons/fa";
 
 const Navbar = () => {
   return (
-    <header className="bg-gradient-to-br from-[#667eea] to-[#a251b0] shadow-md sticky top-0 z-50">
+    <header className="bg-linear-to-br from-[#667eea] to-[#a251b0] shadow-md sticky top-0 z-50">
       <nav className="text-white max-w-screen-2xl mx-auto px-4 py-4 flex flex-wrap justify-between items-center">
         {/* Logo */}
         <div className="shrink-0 flex items-center text-2xl font-bold">

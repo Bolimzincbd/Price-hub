@@ -8,15 +8,15 @@ const Login = () => {
     <div className="min-h-[80vh] flex items-center justify-center px-4 py-12">
       {/* Background decoration */}
       <div className="absolute inset-0 -z-10 overflow-hidden">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full bg-gradient-to-br from-[#667eea]/20 to-[#764ba2]/20 blur-3xl opacity-50"></div>
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full bg-linear-to-br from-[#667eea]/20 to-[#764ba2]/20 blur-3xl opacity-50"></div>
       </div>
 
       <div className="bg-white rounded-2xl p-8 md:p-12 shadow-2xl w-full max-w-md border border-gray-100 relative overflow-hidden">
         {/* Top Accent Line */}
-        <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-[#667eea] to-[#764ba2]"></div>
+        <div className="absolute top-0 left-0 w-full h-2 bg-linear-to-r from-[#667eea] to-[#764ba2]"></div>
 
         <div className="text-center mb-8">
-          <div className="text-3xl font-bold bg-gradient-to-r from-[#667eea] to-[#764ba2] bg-clip-text text-transparent mb-2">
+          <div className="text-3xl font-bold bg-linear-to-r from-[#667eea] to-[#764ba2] bg-clip-text text-transparent mb-2">
             PriceHub
           </div>
           <h1 className="text-2xl font-bold text-gray-800 mb-2">Welcome Back</h1>
@@ -50,7 +50,7 @@ const Login = () => {
             <a href="#" className="text-[#667eea] font-semibold hover:underline">Forgot Password?</a>
           </div>
 
-          <button className="w-full bg-gradient-to-r from-[#667eea] to-[#764ba2] text-white font-bold py-3.5 rounded-lg hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 active:scale-95">
+          <button className="w-full bg-linear-to-r from-[#667eea] to-[#764ba2] text-white font-bold py-3.5 rounded-lg hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 active:scale-95">
             Login
           </button>
         </form>

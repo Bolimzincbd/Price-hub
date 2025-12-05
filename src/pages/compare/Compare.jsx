@@ -57,7 +57,7 @@ const Compare = () => {
                   ✕
                 </button>
                 
-                <div className="bg-gradient-to-b from-gray-50 to-white p-8 flex items-center justify-center h-64">
+                <div className="bg-linear-to-b from-gray-50 to-white p-8 flex items-center justify-center h-64">
                    <img 
                      src={getImgUrl(phone.coverImage)} 
                      alt={phone.name} 

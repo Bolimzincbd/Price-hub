@@ -1,29 +1,49 @@
 /* src/style.css */
 
-/* Remove the rigid height constraints that break scrolling/zooming */
+/* Fix layout consistency and zoom issues */
 html,
 body {
   width: 100%;
-  overflow-x: hidden; /* Prevents horizontal scrolling */
+  overflow-x: hidden; /* Prevents accidental horizontal scroll */
   margin: 0;
   padding: 0;
-  background-color: #f8f9fa; /* Light background to match your design */
-  color: #333;
+  /* Match the Figma background color (Light Theme) */
+  background-color: #f5f7fa; 
+  color: #0f1419;
+  min-height: 100vh;
 }
 
 #app {
-  min-height: 100vh; /* Allow app to grow with content */
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
-/* Keep Swiper styles if you are using them */
+/* Swiper Styling Updates */
 .swiper {
   width: 100%;
-  height: 100%;
+  padding-bottom: 40px !important; /* Space for pagination dots */
 }
 
 .swiper-slide {
-  /* Removed fixed background/text alignment to let your React components control the style */
   display: flex;
   justify-content: center;
   align-items: center;
+  height: auto; /* Let content dictate height */
+  /* Removed the dark background (#444) to fit the new light theme */
+}
+
+/* Custom Scrollbar for better aesthetics */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #f1f1f1; 
+}
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1; 
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8; 
 }
