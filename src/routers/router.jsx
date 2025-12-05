@@ -1,8 +1,9 @@
 import { createBrowserRouter } from "react-router-dom";
 import App from "../App"; 
 import Home from "../pages/home/Home";
-import About from "../pages/About"
+import About from "../pages/about/About"
 import Compare from "../pages/compare/Compare";
+import Login from "../pages/UI/Login";
 
 const router = createBrowserRouter([
   {
@@ -20,6 +21,10 @@ const router = createBrowserRouter([
       {
         path: "/compare",
         element: <Compare/>
+      },
+      {
+        path: "/login",
+        element: <Login/>
       }
     ],
   },
