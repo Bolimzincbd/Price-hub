@@ -1,251 +1,47 @@
-// backend/seed.js
-const mongoose = require('mongoose');
-const dotenv = require('dotenv');
-const Phone = require('./models/Phone');
+const mongoose = require("mongoose");
+const dotenv = require("dotenv");
+const Phone = require("./models/Phone"); // Ensure this path is correct based on your folder structure
+const fs = require("fs");
+const path = require("path");
 
+// Load env vars
 dotenv.config();
 
-// Existing data from your phones.json
-const phones = [
-  {
-    "_id": 1,
-    "name": "iPhone 11 Pro Max",
-    "description": "The iPhone 11 Pro Max is a 2019 flagship smartphone with triple camera system and Super Retina XDR display.",
-    "category": "iphone",
-    "upcoming": false,
-    "latest": true,
-    "recommend": true,
-    "coverImage": "apple-iphone-11.jpg",
-    "price": 899.99,
-    "year": 2019,
-    "rating": 4.8,
-    "reviewCount": 120,
-    "specs": {
-      "display": "6.5\" Super Retina XDR OLED",
-      "processor": "A13 Bionic chip",
-      "ram": "4GB",
-      "storage": "64GB / 256GB / 512GB",
-      "battery": "3969 mAh",
-      "camera": "12MP Triple (Ultra Wide, Wide, Telephoto)"
-    },
-    "reviews": [
-      { "user": "Sarah J.", "rating": 5, "comment": "Still the best battery life I have ever had on an iPhone!" },
-      { "user": "Mike T.", "rating": 4, "comment": "Great camera, but a bit heavy." }
-    ],
-    "stores": [
-      { "name": "Apple Store", "price": 899.99, "url": "#" },
-      { "name": "Amazon", "price": 870.00, "url": "#" },
-      { "name": "Best Buy", "price": 899.99, "url": "#" }
-    ]
-  },
-  {
-    "_id": 2,
-    "name": "iPhone 11",
-    "description": "The iPhone 11 is a 2019 smartphone featuring dual cameras and all-day battery life.",
-    "category": "iphone",
-    "upcoming": false,
-    "latest": false,
-    "recommend": true,
-    "coverImage": "apple-iphone-11.jpg",
-    "price": 699.99,
-    "year": 2019,
-    "rating": 4.7,
-    "reviewCount": 215,
-    "specs": {
-      "display": "6.1\" Liquid Retina HD",
-      "processor": "A13 Bionic chip",
-      "ram": "4GB",
-      "storage": "64GB / 128GB / 256GB",
-      "battery": "3110 mAh",
-      "camera": "12MP Dual (Ultra Wide, Wide)"
-    },
-    "reviews": [
-      { "user": "Alex R.", "rating": 5, "comment": "Perfect value for money." }
-    ],
-    "stores": [
-      { "name": "Apple Store", "price": 699.99, "url": "#" },
-      { "name": "Walmart", "price": 649.00, "url": "#" }
-    ]
-  },
-  {
-    "_id": 3,
-    "name": "iPhone 12",
-    "description": "The iPhone 12 is a 2020 smartphone with 5G, A14 Bionic chip, and Ceramic Shield.",
-    "category": "iphone",
-    "upcoming": false,
-    "latest": false,
-    "recommend": true,
-    "coverImage": "apple-iphone-12.jpg",
-    "price": 799.99,
-    "year": 2020,
-    "rating": 4.8,
-    "reviewCount": 180,
-    "specs": {
-      "display": "6.1\" Super Retina XDR",
-      "processor": "A14 Bionic chip",
-      "ram": "4GB",
-      "storage": "64GB / 128GB / 256GB",
-      "battery": "2815 mAh",
-      "camera": "12MP Dual system"
-    },
-    "reviews": [
-      { "user": "Emily W.", "rating": 5, "comment": "The flat edges design is beautiful." }
-    ],
-    "stores": [
-      { "name": "Apple Store", "price": 799.99, "url": "#" },
-      { "name": "Target", "price": 799.99, "url": "#" }
-    ]
-  },
-  {
-    "_id": 4,
-    "name": "iPhone 13",
-    "description": "The iPhone 13 is a 2021 smartphone with advanced dual-camera system and cinematic mode.",
-    "category": "iphone",
-    "upcoming": false,
-    "latest": false,
-    "recommend": true,
-    "coverImage": "apple-iphone-13.jpg",
-    "price": 899.99,
-    "year": 2021,
-    "rating": 4.9,
-    "reviewCount": 300,
-    "specs": {
-      "display": "6.1\" Super Retina XDR",
-      "processor": "A15 Bionic chip",
-      "ram": "4GB",
-      "storage": "128GB / 256GB / 512GB",
-      "battery": "3240 mAh",
-      "camera": "12MP Dual with Sensor-shift OIS"
-    },
-    "reviews": [
-        { "user": "Chris P.", "rating": 5, "comment": "Cinematic mode is a game changer!" }
-    ],
-    "stores": [
-        { "name": "Apple Store", "price": 899.99, "url": "#" }
-    ]
-  },
-  {
-    "_id": 5,
-    "name": "iPhone 13 Pro",
-    "description": "The iPhone 13 Pro is a 2021 flagship with ProMotion display, telephoto lens, and pro camera features.",
-    "category": "iphone",
-    "upcoming": false,
-    "latest": false,
-    "recommend": true,
-    "coverImage": "apple-iphone-13-pro.jpg",
-    "price": 1099.99,
-    "year": 2021,
-    "rating": 4.9,
-    "reviewCount": 150,
-    "specs": {
-      "display": "6.1\" Super Retina XDR with ProMotion",
-      "processor": "A15 Bionic chip",
-      "ram": "6GB",
-      "storage": "128GB / 256GB / 512GB / 1TB",
-      "battery": "3095 mAh",
-      "camera": "12MP Pro Camera System"
-    },
-    "reviews": [],
-    "stores": [
-        { "name": "Amazon", "price": 1050.00, "url": "#" }
-    ]
-  },
-  {
-    "_id": 6,
-    "name": "Samsung Galaxy S23",
-    "description": "Premium Android flagship with advanced camera system and stunning AMOLED display.",
-    "category": "samsung",
-    "upcoming": false,
-    "latest": true,
-    "recommend": true,
-    "coverImage": "samsung-galaxy-s23.jpg",
-    "price": 799.99,
-    "year": 2023,
-    "rating": 4.7,
-    "reviewCount": 95,
-    "specs": {
-      "display": "6.1\" Dynamic AMOLED 2X",
-      "processor": "Snapdragon 8 Gen 2",
-      "ram": "8GB",
-      "storage": "128GB / 256GB",
-      "battery": "3900 mAh",
-      "camera": "50MP Triple Camera"
-    },
-    "reviews": [
-        { "user": "Jordan", "rating": 5, "comment": "Finally a compact phone with great power." }
-    ],
-    "stores": [
-        { "name": "Samsung Store", "price": 799.99, "url": "#" }
-    ]
-  },
-  {
-    "_id": 7,
-    "name": "Samsung Galaxy S23 Ultra",
-    "description": "Ultimate Samsung flagship with S Pen, 200MP camera, and premium performance.",
-    "category": "samsung",
-    "upcoming": false,
-    "latest": true,
-    "recommend": true,
-    "coverImage": "samsung-galaxy-s23-ultra.jpg",
-    "price": 1199.99,
-    "year": 2023,
-    "rating": 4.9,
-    "reviewCount": 320,
-    "specs": {
-      "display": "6.8\" Dynamic AMOLED 2X",
-      "processor": "Snapdragon 8 Gen 2",
-      "ram": "8GB / 12GB",
-      "storage": "256GB / 512GB / 1TB",
-      "battery": "5000 mAh",
-      "camera": "200MP Quad Camera"
-    },
-    "reviews": [
-        { "user": "TechGuru", "rating": 5, "comment": "The zoom on this camera is insane." }
-    ],
-    "stores": [
-        { "name": "Samsung Store", "price": 1199.99, "url": "#" },
-        { "name": "Best Buy", "price": 1199.99, "url": "#" }
-    ]
-  },
-  {
-    "_id": 8,
-    "name": "OnePlus 11",
-    "description": "Fast and powerful Android phone with Hasselblad camera and rapid charging technology.",
-    "category": "oneplus",
-    "upcoming": true,
-    "latest": true,
-    "recommend": true,
-    "coverImage": "oneplus-11.jpg",
-    "price": 699.99,
-    "year": 2023,
-    "rating": 4.6,
-    "reviewCount": 85,
-    "specs": {
-      "display": "6.7\" AMOLED with LTPO 3.0",
-      "processor": "Snapdragon 8 Gen 2",
-      "ram": "8GB / 16GB",
-      "storage": "128GB / 256GB",
-      "battery": "5000 mAh",
-      "camera": "50MP Triple (Hasselblad)"
-    },
-    "reviews": [
-        { "user": "OnePlusFan", "rating": 4, "comment": "Super fast charging!" }
-    ],
-    "stores": [
-        { "name": "OnePlus Store", "price": 699.99, "url": "#" }
-    ]
-  }
-]
-
-mongoose.connect(process.env.MONGODB_URI)
-  .then(async () => {
-    console.log('Connected to MongoDB');
-    await Phone.deleteMany({}); // Clears existing data
-    await Phone.insertMany(phones);
-    console.log('Data Imported Successfully');
-    process.exit();
-  })
+// Connect to DB
+mongoose
+  .connect(process.env.MONGODB_URI)
+  .then(() => console.log("Connected to MongoDB"))
   .catch((err) => {
-    console.error(err);
+    console.error("MongoDB connection error:", err);
     process.exit(1);
   });
+
+// Read the JSON file
+const phonesData = JSON.parse(
+  fs.readFileSync(path.join(__dirname, "../public/phones.json"), "utf-8")
+);
+
+// KEY FIX: Remove the numeric '_id' so MongoDB generates a unique ObjectId string
+const phonesToInsert = phonesData.map((phone) => {
+  const { _id, ...phoneDataWithoutId } = phone;
+  return phoneDataWithoutId;
+});
+
+const seedDB = async () => {
+  try {
+    // Clear existing data to avoid duplicates
+    await Phone.deleteMany({});
+    console.log("Old phones removed");
+
+    // Insert new data with auto-generated IDs
+    await Phone.insertMany(phonesToInsert);
+    console.log("Phone data seeded successfully!");
+
+    process.exit();
+  } catch (error) {
+    console.error("Error seeding database:", error);
+    process.exit(1);
+  }
+};
+
+seedDB();
