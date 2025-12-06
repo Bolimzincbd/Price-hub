@@ -1,13 +1,5 @@
 import React, { useEffect, useState } from "react";
 import Phonecard from "../card/Phonecard";
-// Import Swiper React components
-import { Swiper, SwiperSlide } from "swiper/react";
-// import required modules
-import { Pagination, Navigation } from "swiper/modules";
-// Import Swiper styles
-import "swiper/css";
-import "swiper/css/pagination";
-import "swiper/css/navigation";
 
 const Latest = () => {
   const [phones, setPhones] = useState([]);
@@ -28,9 +20,7 @@ const Latest = () => {
 
   const latestPhones = phones.filter(phone => phone.latest === true);
 
-  if (loading) {
-    return <div className="py-16 text-center text-[#536471]">Loading...</div>;
-  }
+  if (loading) return null;
 
   return (
     <div className="py-10 px-6">
@@ -44,31 +34,14 @@ const Latest = () => {
         </div>
       </div>
 
-      {latestPhones.length === 0 ? (
-        <p className="text-center text-[#536471]">
-          No latest phones found
-        </p>
-      ) : (
-        <Swiper
-          slidesPerView={1}
-          spaceBetween={30}
-          navigation={true}
-          breakpoints={{
-            640: { slidesPerView: 1, spaceBetween: 20 },
-            768: { slidesPerView: 2, spaceBetween: 40 },
-            1024: { slidesPerView: 3, spaceBetween: 30 },
-            1280: { slidesPerView: 4, spaceBetween: 30 },
-          }}
-          modules={[Pagination, Navigation]}
-          className="mySwiper !pb-10"
-        >
-          {latestPhones.map((phone) => (
-            <SwiperSlide key={phone._id}>
+      {/* Horizontal Scroll Container */}
+      <div className="flex gap-6 overflow-x-auto pb-8 pt-2 scrollbar-hide snap-x">
+        {latestPhones.map((phone) => (
+            <div key={phone._id} className="min-w-[280px] md:min-w-[320px] snap-start">
               <Phonecard phone={phone} />
-            </SwiperSlide>
-          ))}
-        </Swiper>
-      )}
+            </div>
+        ))}
+      </div>
     </div>
   );
 };

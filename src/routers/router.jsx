@@ -1,10 +1,11 @@
 import { createBrowserRouter } from "react-router-dom";
 import App from "../App"; 
 import Home from "../pages/home/Home";
-import About from "../pages/about/About";  // Fixed path based on your folders
+import About from "../pages/about/About";
 import Compare from "../pages/compare/Compare";
 import Login from "../pages/UI/Login";
-import PhoneDetail from "../pages/phones/PhoneDetail"; // Import your new page
+import Signup from "../pages/UI/SignUp"; // Import the new page
+import PhoneDetail from "../pages/phones/PhoneDetail";
 
 const router = createBrowserRouter([
   {
@@ -27,7 +28,10 @@ const router = createBrowserRouter([
         path: "/login",
         element: <Login/>
       },
-      // Add this dynamic route
+      {
+        path: "/signup", // Add this new path
+        element: <Signup/>
+      },
       {
         path: "/phones/:id", 
         element: <PhoneDetail/>
