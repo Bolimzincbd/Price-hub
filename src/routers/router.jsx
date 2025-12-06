@@ -7,6 +7,8 @@ import Login from "../pages/UI/Login";
 import Signup from "../pages/UI/SignUp";
 import PhoneDetail from "../pages/phones/PhoneDetail";
 import AdminDashboard from "../pages/admin/AdminDashboard"; // Import Admin Page
+import Search from "../pages/search/Search";
+import AllPhones from "../pages/home/Allphones";
 
 const router = createBrowserRouter([
   {
@@ -19,6 +21,8 @@ const router = createBrowserRouter([
       { path: "/login", element: <Login/> },
       { path: "/signup", element: <Signup/> },
       { path: "/phones/:id", element: <PhoneDetail/> },
+      { path: "/search", element: <Search /> },
+      { path: "/phones", element: <AllPhones /> },
       
       // Add the Admin Route here
       { 

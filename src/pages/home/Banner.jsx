@@ -1,6 +1,16 @@
-import React from "react";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const Banner = () => {
+  const [searchTerm, setSearchTerm] = useState("");
+  const navigate = useNavigate();
+
+  const handleSearch = () => {
+    if (searchTerm.trim()) {
+      navigate(`/search?q=${searchTerm}`);
+    }
+  };
+
   return (
     <div className="py-16 px-6 text-center bg-gradient-to-br from-[#667eea] to-[#764ba2] text-white rounded-2xl mx-4 mt-6 shadow-xl mb-12">
       <h1 className="text-5xl font-bold mb-4">Find the Best Phone Prices</h1>
@@ -10,9 +20,15 @@ const Banner = () => {
         <input 
           type="text" 
           placeholder="Search for phones..." 
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
           className="flex-1 border-none px-5 py-3 text-base outline-none text-gray-700 rounded-l-full"
         />
-        <button className="bg-gradient-to-br from-[#667eea] to-[#764ba2] text-white border-none py-3 px-8 rounded-full font-semibold cursor-pointer hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300">
+        <button 
+          onClick={handleSearch}
+          className="bg-gradient-to-br from-[#667eea] to-[#764ba2] text-white border-none py-3 px-8 rounded-full font-semibold cursor-pointer hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300"
+        >
           Search
         </button>
       </div>
