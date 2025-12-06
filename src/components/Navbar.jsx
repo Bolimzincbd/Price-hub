@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { FaSearch, FaUser } from "react-icons/fa";
-import { SignedIn, SignedOut, SignInButton, UserButton, useUser } from "@clerk/clerk-react";
+import { SignedIn, SignedOut, SignInButton, UserButton, useUser, SignOutButton } from "@clerk/clerk-react";
 
 const Navbar = () => {
   const { user } = useUser();
@@ -22,10 +22,12 @@ const Navbar = () => {
   return (
     <header className="bg-gradient-to-br from-[#667eea] to-[#a251b0] shadow-md sticky top-0 z-50">
       <nav className="text-white max-w-screen-2xl mx-auto px-4 py-4 flex flex-wrap justify-between items-center">
+        {/* Logo */}
         <div className="shrink-0 flex items-center text-2xl font-bold">
           <Link to="/" className="hover:opacity-90 transition-opacity">PhoneHub</Link>
         </div>
 
+        {/* Navigation Links */}
         <ul className="hidden md:flex gap-8 text-base font-medium items-center">
           <li><Link to="/" className="hover:text-white/80 transition-colors">Home</Link></li>
           <li><Link to="/about" className="hover:text-white/80 transition-colors">About</Link></li>
@@ -39,18 +41,25 @@ const Navbar = () => {
           </SignedIn>
         </ul>
 
+        {/* Action Buttons */}
         <div className="flex items-center gap-4">
-          
-          <div className="flex items-center">
+          <div className="flex items-center gap-3">
             <SignedOut>
               <SignInButton mode="modal">
-                <button className="flex items-center gap-2 bg-white/20 hover:bg-white/30 px-5 py-2 rounded-full transition-all font-medium backdrop-blur-sm border border-white/20 shadow-sm cursor-pointer">
-                  <FaUser className="text-sm" /> Login
+                <button className="flex items-center gap-2 bg-white/20 hover:bg-white/30 px-5 py-2 rounded-full transition-all font-medium backdrop-blur-sm border border-white/20 shadow-sm cursor-pointer text-white">
+                  <FaUser className="text-sm" /> 
+                  <span>Login</span>
                 </button>
               </SignInButton>
             </SignedOut>
+
             <SignedIn>
               <UserButton afterSignOutUrl="/" />
+              <SignOutButton>
+                <button className="flex items-center gap-2 bg-white/20 hover:bg-white/30 px-5 py-2 rounded-full transition-all font-medium backdrop-blur-sm border border-white/20 shadow-sm cursor-pointer text-white">
+                  Logout
+                </button>
+              </SignOutButton>
             </SignedIn>
           </div>
         </div>

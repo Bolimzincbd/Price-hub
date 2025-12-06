@@ -8,7 +8,9 @@ dotenv.config();
 const app = express();
 
 app.use(cors());
-app.use(express.json());
+
+// UPDATE THIS LINE: Increase limit to 10MB (or more) for images
+app.use(express.json({ limit: '10mb' }));
 
 mongoose.connect(process.env.MONGODB_URI)
   .then(() => console.log('MongoDB Connected'))

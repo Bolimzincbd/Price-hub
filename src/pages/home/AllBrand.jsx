@@ -28,24 +28,27 @@ const AllBrand = () => {
       });
   }, []);
   
-  // Filter Logic
-  useEffect(() => {
-    let result = phones;
+// Filter Logic
+    useEffect(() => {
+        let result = phones;
 
-    if (selectedBrand !== "All") {
-      result = result.filter(phone => phone.category === selectedBrand.toLowerCase());
-    }
+        if (selectedBrand !== "All") {
+            result = result.filter(phone => phone.category === selectedBrand.toLowerCase());
+        }
 
-    result = result.filter(phone => phone.price <= priceRange);
-    
-    // Parse RAM from string "8GB" to number 8
-    result = result.filter(phone => {
-        const ram = parseInt(phone.specs.ram);
-        return ram >= minRam;
-    });
+        result = result.filter(phone => phone.price <= priceRange);
 
-    setFilteredPhones(result);
-  }, [selectedBrand, priceRange, minRam, phones]);
+        // Parse RAM from string "8GB" to number 8
+        result = result.filter(phone => {
+            // FIX: Check if specs and specs.ram exist before parsing
+            if (!phone.specs || !phone.specs.ram) return false; 
+            
+            const ram = parseInt(phone.specs.ram);
+            return ram >= minRam;
+        });
+
+        setFilteredPhones(result);
+    }, [selectedBrand, priceRange, minRam, phones]);
 
   const brands = ["All", "iPhone", "Samsung", "OnePlus"];
 
