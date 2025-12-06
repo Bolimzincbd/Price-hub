@@ -12,12 +12,14 @@ const AllBrand = () => {
   const [priceRange, setPriceRange] = useState(2000);
   const [minRam, setMinRam] = useState(0);
 
-  useEffect(() => {
-    fetch("phones.json")
+ useEffect(() => {
+    // OLD: fetch("phones.json")
+    // NEW: Connect to backend
+    fetch("http://localhost:5000/api/phones")
       .then((res) => res.json())
       .then((data) => {
         setPhones(data);
-        setFilteredPhones(data);
+        setFilteredPhones(data); // Initialize filtered list
         setLoading(false);
       })
       .catch((error) => {
@@ -25,7 +27,7 @@ const AllBrand = () => {
         setLoading(false);
       });
   }, []);
-
+  
   // Filter Logic
   useEffect(() => {
     let result = phones;

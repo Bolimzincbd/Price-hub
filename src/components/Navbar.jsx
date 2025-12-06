@@ -7,7 +7,7 @@ const Navbar = () => {
   const { user } = useUser();
   
   // REPLACE THIS EMAIL WITH YOUR REAL GMAIL ADDRESS
-  const ADMIN_EMAIL = "your.email@gmail.com"; 
+  const ADMIN_EMAIL = "mooneweea@gmail.com"; 
   
   const isAdmin = user?.primaryEmailAddress?.emailAddress === ADMIN_EMAIL;
 

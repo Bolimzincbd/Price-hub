@@ -8,14 +8,23 @@ const PhoneDetail = () => {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("specs");
 
-  useEffect(() => {
-    fetch("http://localhost:5000/api/phones") // UPDATED URL
-      .then((res) => res.json())
+useEffect(() => {
+    // Fetch only the specific phone by ID
+    fetch(`http://localhost:5000/api/phones/${id}`)
+      .then((res) => {
+        if (!res.ok) {
+            throw new Error("Phone not found");
+        }
+        return res.json();
+      })
       .then((data) => {
-        setPhones(data);
-        setFilteredPhones(data);
+        setPhone(data);
         setLoading(false);
       })
+      .catch((error) => {
+        console.error("Error loading phone data:", error);
+        setLoading(false);
+      });
   }, [id]);
 
   if (loading) {

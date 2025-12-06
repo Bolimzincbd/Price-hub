@@ -9,13 +9,13 @@ const Compare = () => {
   const [activeSlotIndex, setActiveSlotIndex] = useState(null);
 
   // 1. Fetch data on load
-  useEffect(() => {
-    fetch("/phones.json")
+useEffect(() => {
+    fetch("http://localhost:5000/api/phones")
       .then((res) => res.json())
       .then((data) => setAllPhones(data))
       .catch((err) => console.error("Failed to load phones", err));
   }, []);
-
+  
   // 2. Open modal to select a phone for a specific slot
   const handleAddClick = (index) => {
     setActiveSlotIndex(index);

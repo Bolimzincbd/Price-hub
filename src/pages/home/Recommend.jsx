@@ -10,8 +10,8 @@ const Recommend = () => {
   const [phones, setPhones] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetch("phones.json")
+useEffect(() => {
+    fetch("http://localhost:5000/api/phones")
       .then((res) => res.json())
       .then((data) => {
         setPhones(data);
