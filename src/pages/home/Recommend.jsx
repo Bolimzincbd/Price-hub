@@ -1,5 +1,10 @@
 import React, { useEffect, useState } from "react";
 import Phonecard from "../card/Phonecard";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Navigation, Pagination } from "swiper/modules";
+import "swiper/css";
+import "swiper/css/navigation";
+import "swiper/css/pagination";
 
 const Recommend = () => {
   const [phones, setPhones] = useState([]);
@@ -31,14 +36,25 @@ const Recommend = () => {
         </div>
       </div>
 
-       {/* Horizontal Scroll Container */}
-       <div className="flex gap-6 overflow-x-auto pb-8 pt-2 scrollbar-hide snap-x">
+      <Swiper
+        modules={[Navigation, Pagination]}
+        spaceBetween={24}
+        slidesPerView={1.2}
+        navigation
+        pagination={{ clickable: true }}
+        breakpoints={{
+          640: { slidesPerView: 2.2 },
+          768: { slidesPerView: 3.2 },
+          1024: { slidesPerView: 4 },
+        }}
+        className="pb-10"
+      >
         {recommendedPhones.map((phone) => (
-            <div key={phone._id} className="min-w-[280px] md:min-w-[320px] snap-start">
-              <Phonecard phone={phone} />
-            </div>
+          <SwiperSlide key={phone._id}>
+            <Phonecard phone={phone} />
+          </SwiperSlide>
         ))}
-      </div>
+      </Swiper>
     </div>
   );
 };

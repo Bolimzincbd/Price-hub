@@ -5,8 +5,11 @@ import { SignedIn, SignedOut, SignInButton, UserButton, useUser } from "@clerk/c
 
 const Navbar = () => {
   const { user } = useUser();
-  // Check if user is admin (You can customize this logic)
-  const isAdmin = user?.publicMetadata?.role === "admin" || user?.primaryEmailAddress?.emailAddress?.includes("admin");
+  
+  // REPLACE THIS EMAIL WITH YOUR REAL GMAIL ADDRESS
+  const ADMIN_EMAIL = "your.email@gmail.com"; 
+  
+  const isAdmin = user?.primaryEmailAddress?.emailAddress === ADMIN_EMAIL;
 
   return (
     <header className="bg-gradient-to-br from-[#667eea] to-[#a251b0] shadow-md sticky top-0 z-50">
@@ -24,7 +27,7 @@ const Navbar = () => {
           
           <SignedIn>
             {isAdmin ? (
-              <li><Link to="/admin-dashboard" className="text-yellow-300 hover:text-yellow-100 font-bold">Admin Panel</Link></li>
+              <li><Link to="/admin-dashboard" className="text-yellow-300 hover:text-yellow-100 font-bold border border-yellow-300 rounded px-3 py-1">Admin Panel</Link></li>
             ) : (
               <li><Link to="/dashboard" className="hover:text-white/80">My Dashboard</Link></li>
             )}

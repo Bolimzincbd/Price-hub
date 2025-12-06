@@ -33,8 +33,10 @@ const AdminDashboard = () => {
     }
   };
   
-  // Basic admin check - In production use Public Metadata
-  const isAdmin = user?.publicMetadata?.role === "admin" || user?.primaryEmailAddress?.emailAddress?.includes("admin");
+  // REPLACE THIS EMAIL WITH YOUR REAL GMAIL ADDRESS
+  const ADMIN_EMAIL = "mooneweea@gmail.com"; 
+  
+  const isAdmin = user?.primaryEmailAddress?.emailAddress === ADMIN_EMAIL;
 
   if (!isSignedIn || !isAdmin) {
     return <Navigate to="/dashboard" />;
