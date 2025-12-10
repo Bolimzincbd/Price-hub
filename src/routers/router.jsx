@@ -9,6 +9,7 @@ import PhoneDetail from "../pages/phones/PhoneDetail";
 import AdminDashboard from "../pages/admin/AdminDashboard"; // Import Admin Page
 import Search from "../pages/search/Search";
 import AllPhones from "../pages/home/Allphones";
+import UserDashboard from "../pages/user/UserDashboard";
 
 const router = createBrowserRouter([
   {
@@ -28,7 +29,13 @@ const router = createBrowserRouter([
       { 
         path: "/admin-dashboard", 
         element: <AdminDashboard/> 
+      },
+
+      {
+        path: "/dashboard",
+        element: <UserDashboard />
       }
+
     ],
   },
 ]);

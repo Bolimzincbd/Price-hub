@@ -12,9 +12,7 @@ const AllBrand = () => {
   const [priceRange, setPriceRange] = useState(2000);
   const [minRam, setMinRam] = useState(0);
 
- useEffect(() => {
-    // OLD: fetch("phones.json")
-    // NEW: Connect to backend
+  useEffect(() => {
     fetch("http://localhost:5000/api/phones")
       .then((res) => res.json())
       .then((data) => {
@@ -28,65 +26,67 @@ const AllBrand = () => {
       });
   }, []);
   
-// Filter Logic
-    useEffect(() => {
-        let result = phones;
+  // Filter Logic
+  useEffect(() => {
+    let result = phones;
 
-        if (selectedBrand !== "All") {
-            result = result.filter(phone => phone.category === selectedBrand.toLowerCase());
-        }
+    if (selectedBrand !== "All") {
+      result = result.filter(phone => phone.category === selectedBrand.toLowerCase());
+    }
 
-        result = result.filter(phone => phone.price <= priceRange);
+    result = result.filter(phone => phone.price <= priceRange);
+    
+    // Parse RAM from string "8GB" to number 8
+    result = result.filter(phone => {
+        if (!phone.specs || !phone.specs.ram) return false;
+        const ram = parseInt(phone.specs.ram);
+        return ram >= minRam;
+    });
 
-        // Parse RAM from string "8GB" to number 8
-        result = result.filter(phone => {
-            // FIX: Check if specs and specs.ram exist before parsing
-            if (!phone.specs || !phone.specs.ram) return false; 
-            
-            const ram = parseInt(phone.specs.ram);
-            return ram >= minRam;
-        });
-
-        setFilteredPhones(result);
-    }, [selectedBrand, priceRange, minRam, phones]);
+    setFilteredPhones(result);
+  }, [selectedBrand, priceRange, minRam, phones]);
 
   const brands = ["All", "iPhone", "Samsung", "OnePlus"];
 
   if (loading) return <div className="py-16 text-center text-[#536471]">Loading...</div>;
 
   return (
-    <div className="py-10 px-4 md:px-6" id="browse">
-      <h2 className="text-3xl font-bold text-[#0f1419] mb-8">Browse Phones</h2>
+    <div className="py-10 px-4 md:px-6 max-w-screen-2xl mx-auto" id="browse">
+      <h2 className="text-3xl font-bold text-[#0f1419] mb-6">Browse Phones</h2>
 
-      <div className="flex flex-col lg:flex-row gap-8">
-        {/* Sidebar Filter */}
-        <div className="w-full lg:w-64 shrink-0 space-y-8 bg-white p-6 rounded-2xl border border-gray-200 h-fit shadow-sm">
-            <div className="flex items-center gap-2 text-xl font-bold text-[#667eea] border-b pb-4">
-                <FaFilter /> Filters
-            </div>
-
+      {/* HORIZONTAL FILTER BAR */}
+      <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm mb-8 animate-fade-in">
+        <div className="flex flex-wrap items-center justify-between gap-6">
+            
             {/* Brand Filter */}
-            <div>
-                <h3 className="font-semibold mb-3 text-gray-800">Brand</h3>
-                <div className="space-y-2">
+            <div className="flex flex-col gap-2 min-w-[200px]">
+                <div className="flex items-center gap-2 text-sm font-bold text-gray-500 uppercase">
+                    <FaFilter className="text-[#667eea]" /> Brand
+                </div>
+                <div className="flex flex-wrap gap-4">
                     {brands.map((brand) => (
-                        <label key={brand} className="flex items-center gap-3 cursor-pointer group">
+                        <label key={brand} className="flex items-center gap-2 cursor-pointer group hover:opacity-80 transition-opacity">
                             <input 
                                 type="radio" 
                                 name="brand" 
                                 checked={selectedBrand === brand}
                                 onChange={() => setSelectedBrand(brand)}
-                                className="w-4 h-4 text-[#667eea] focus:ring-[#667eea]"
+                                className="accent-[#667eea] w-4 h-4 cursor-pointer"
                             />
-                            <span className={`text-sm ${selectedBrand === brand ? 'font-bold text-[#667eea]' : 'text-gray-600'} group-hover:text-[#667eea]`}>{brand}</span>
+                            <span className={`text-sm font-medium ${selectedBrand === brand ? 'text-[#667eea]' : 'text-gray-600'}`}>
+                                {brand}
+                            </span>
                         </label>
                     ))}
                 </div>
             </div>
 
             {/* Price Filter */}
-            <div>
-                <h3 className="font-semibold mb-3 text-gray-800">Max Price: ${priceRange}</h3>
+            <div className="flex flex-col gap-2 w-full md:w-64">
+                <div className="flex justify-between text-sm">
+                    <span className="font-bold text-gray-500 uppercase">Max Price</span>
+                    <span className="text-[#667eea] font-bold">${priceRange}</span>
+                </div>
                 <input 
                     type="range" 
                     min="0" 
@@ -96,24 +96,20 @@ const AllBrand = () => {
                     onChange={(e) => setPriceRange(e.target.value)}
                     className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#667eea]"
                 />
-                <div className="flex justify-between text-xs text-gray-500 mt-2">
-                    <span>$0</span>
-                    <span>$2000+</span>
-                </div>
             </div>
 
              {/* Specs Filter (RAM) */}
-             <div>
-                <h3 className="font-semibold mb-3 text-gray-800">Min RAM: {minRam}GB</h3>
-                <div className="flex gap-2 flex-wrap">
+             <div className="flex flex-col gap-2">
+                <span className="font-bold text-gray-500 text-sm uppercase">Min RAM</span>
+                <div className="flex flex-wrap gap-2">
                     {[4, 6, 8, 12].map((ram) => (
                         <button 
                             key={ram}
                             onClick={() => setMinRam(ram === minRam ? 0 : ram)}
-                            className={`px-3 py-1 rounded-lg text-xs font-bold border transition-all ${
+                            className={`px-3 py-1.5 rounded-lg text-sm font-semibold border transition-all ${
                                 minRam === ram 
                                 ? "bg-[#667eea] text-white border-[#667eea]" 
-                                : "bg-white text-gray-600 border-gray-200 hover:border-[#667eea]"
+                                : "bg-white text-gray-500 border-gray-200 hover:border-[#667eea] hover:text-[#667eea]"
                             }`}
                         >
                             {ram}GB
@@ -121,25 +117,33 @@ const AllBrand = () => {
                     ))}
                 </div>
             </div>
-        </div>
 
-        {/* Product Grid */}
-        <div className="flex-1">
+            {/* Reset Button */}
+            <button 
+                onClick={() => {setPriceRange(2000); setSelectedBrand("All"); setMinRam(0)}} 
+                className="px-4 py-2 text-sm font-bold text-gray-400 hover:text-red-500 transition-colors border border-dashed border-gray-300 rounded-lg hover:border-red-300"
+            >
+                Reset
+            </button>
+        </div>
+      </div>
+
+      {/* Product Grid */}
+      <div className="w-full">
           {filteredPhones.length === 0 ? (
             <div className="h-64 flex flex-col items-center justify-center text-gray-400 bg-gray-50 rounded-2xl border border-dashed border-gray-300">
                 <p className="text-lg">No phones match your filters</p>
                 <button onClick={() => {setPriceRange(2000); setSelectedBrand("All"); setMinRam(0)}} className="mt-4 text-[#667eea] font-bold hover:underline">Reset Filters</button>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {filteredPhones.map((phone) => (
-                <div key={phone._id} className="h-[400px]">
+                <div key={phone._id} className="h-[420px]">
                     <Phonecard phone={phone} />
                 </div>
               ))}
             </div>
           )}
-        </div>
       </div>
     </div>
   );
