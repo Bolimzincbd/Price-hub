@@ -3,8 +3,8 @@ import App from "../App";
 import Home from "../pages/home/Home";
 import About from "../pages/about/About";
 import Compare from "../pages/compare/Compare";
-import Login from "../pages/UI/Login";
-import Signup from "../pages/UI/SignUp";
+import Login from "../pages/Auth/Login";
+import Signup from "../pages/Auth/SignUp";
 import PhoneDetail from "../pages/phones/PhoneDetail";
 import AdminDashboard from "../pages/admin/AdminDashboard"; // Import Admin Page
 import Search from "../pages/search/Search";
