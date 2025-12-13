@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { getImgUrl } from "../../utils/getImgUrl";
-import { Link } from "react-router-dom"; // Added Link for navigation
+import { Link } from "react-router-dom";
 
 const Compare = () => {
   const [allPhones, setAllPhones] = useState([]);
@@ -8,33 +8,62 @@ const Compare = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [activeSlotIndex, setActiveSlotIndex] = useState(null);
 
-  // 1. Fetch data on load
-useEffect(() => {
+  // 1. Fetch all phones data on load (for the selection modal)
+  useEffect(() => {
     fetch("http://localhost:5000/api/phones")
       .then((res) => res.json())
       .then((data) => setAllPhones(data))
       .catch((err) => console.error("Failed to load phones", err));
   }, []);
+
+  // 2. Load "Compare List" from Local Storage on Mount
+  // This enables the "Add to Compare" button from the Details page to work
+  useEffect(() => {
+    const storedCompare = localStorage.getItem("compareList");
+    if (storedCompare) {
+      try {
+        const parsedList = JSON.parse(storedCompare);
+        if (Array.isArray(parsedList)) {
+           const newSelection = [null, null, null];
+           // Fill up to 3 slots with stored data
+           parsedList.slice(0, 3).forEach((phone, i) => {
+             newSelection[i] = phone;
+           });
+           setSelectedPhones(newSelection);
+        }
+      } catch (e) {
+        console.error("Error parsing compare list", e);
+      }
+    }
+  }, []);
+
+  // Helper to update state AND local storage
+  const updateSelection = (newSelection) => {
+    setSelectedPhones(newSelection);
+    // Filter out nulls to save only valid phone objects
+    const validPhones = newSelection.filter(p => p !== null);
+    localStorage.setItem("compareList", JSON.stringify(validPhones));
+  };
   
-  // 2. Open modal to select a phone for a specific slot
+  // 3. Open modal to select a phone for a specific slot
   const handleAddClick = (index) => {
     setActiveSlotIndex(index);
     setIsModalOpen(true);
   };
 
-  // 3. Confirm selection
+  // 4. Confirm selection from Modal
   const handleSelectPhone = (phone) => {
     const newSelection = [...selectedPhones];
     newSelection[activeSlotIndex] = phone;
-    setSelectedPhones(newSelection);
+    updateSelection(newSelection); // Update state & storage
     setIsModalOpen(false);
   };
 
-  // 4. Remove a phone from comparison
+  // 5. Remove a phone from comparison
   const handleRemovePhone = (index) => {
     const newSelection = [...selectedPhones];
     newSelection[index] = null;
-    setSelectedPhones(newSelection);
+    updateSelection(newSelection); // Update state & storage
   };
 
   return (
@@ -76,7 +105,6 @@ useEffect(() => {
                   
                   {/* Specs List */}
                   <div className="space-y-3 text-gray-600 flex-1">
-                    {/* Helper function to render rows consistent with phones.json structure */}
                     {[
                       { label: "Display", value: phone.specs?.display },
                       { label: "Processor", value: phone.specs?.processor },
