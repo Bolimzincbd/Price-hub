@@ -14,17 +14,20 @@ const Phonecard = ({ phone }) => {
       fetch(`http://localhost:5000/api/wishlist/${user.id}`)
         .then((res) => res.json())
         .then((data) => {
-          const exists = data.some((item) => 
-            (item.phoneId && item.phoneId._id === phone._id) || item.phoneId === phone._id
-          );
+          // FIX: Convert both IDs to String() to ensure they match
+          const exists = data.some((item) => {
+             // item.phoneId might be an object (populated) or string (id only)
+             const itemId = item.phoneId?._id || item.phoneId;
+             return String(itemId) === String(phone._id);
+          });
           setInWishlist(exists);
         })
         .catch((err) => console.error(err));
     }
   }, [user, phone]);
 
-  const toggleWishlist = async (e) => {
-    e.preventDefault(); // Prevent navigating to details page
+const toggleWishlist = async (e) => {
+    e.preventDefault(); 
     e.stopPropagation(); 
 
     if (!user) {
@@ -32,27 +35,35 @@ const Phonecard = ({ phone }) => {
       return;
     }
 
+    const previousState = inWishlist;
+    setInWishlist(!previousState); // Optimistic UI update
+
     try {
-      if (inWishlist) {
-        await fetch(`http://localhost:5000/api/wishlist/${user.id}/${phone._id}`, { method: "DELETE" });
-        setInWishlist(false);
+      let res;
+      if (previousState) {
+        res = await fetch(`http://localhost:5000/api/wishlist/${user.id}/${phone._id}`, { method: "DELETE" });
       } else {
-        await fetch(`http://localhost:5000/api/wishlist`, {
+        res = await fetch(`http://localhost:5000/api/wishlist`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ userId: user.id, phoneId: phone._id }),
         });
-        setInWishlist(true);
+      }
+
+      if (!res.ok) {
+        throw new Error("Request failed");
       }
     } catch (error) {
       console.error("Wishlist error:", error);
+      setInWishlist(previousState); // Revert state on failure
+      alert("Could not update wishlist");
     }
   };
 
   return (
     <div className="bg-white rounded-2xl border border-gray-200 p-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:border-[#667eea] group h-full flex flex-col cursor-pointer relative">
       
-      {/* --- WISHLIST BUTTON (Top Right) --- */}
+      {/* --- WISHLIST BUTTON --- */}
       <button
         onClick={toggleWishlist}
         className="absolute top-4 right-4 z-20 p-2 bg-white rounded-full shadow-md text-lg transition-transform hover:scale-110 hover:bg-red-50 text-gray-400"

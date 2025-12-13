@@ -1,9 +1,10 @@
+// backend/server.js
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const Phone = require('./models/Phone');
-const Wishlist = require('./models/Wishlist'); // Ensure this model exists
+const Wishlist = require('./models/Wishlist'); 
 
 dotenv.config();
 const app = express();
@@ -69,7 +70,7 @@ app.delete('/api/phones/:id', async (req, res) => {
   }
 });
 
-// --- REVIEW ROUTE (FIXED) ---
+// --- REVIEW ROUTE ---
 app.post('/api/phones/:id/reviews', async (req, res) => {
   const { user, rating, comment } = req.body;
   
@@ -103,7 +104,9 @@ app.post('/api/phones/:id/reviews', async (req, res) => {
 app.get('/api/wishlist/:userId', async (req, res) => {
   try {
     // Populate phone details so we can display them
-    const wishlist = await Wishlist.find({ userId: req.params.userId }).populate('phoneId');
+    const wishlist = await Wishlist.find({ userId: req.params.userId })
+      .populate('phoneId')
+      .sort({ addedAt: -1 });
     res.json(wishlist);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -113,27 +116,57 @@ app.get('/api/wishlist/:userId', async (req, res) => {
 // Add to wishlist
 app.post('/api/wishlist', async (req, res) => {
   const { userId, phoneId } = req.body;
+  
+  if (!userId || !phoneId) {
+    return res.status(400).json({ msg: "Missing userId or phoneId" });
+  }
+
   try {
     // Check if already exists
     const existing = await Wishlist.findOne({ userId, phoneId });
-    if (existing) return res.status(400).json({ msg: 'Already in wishlist' });
+    if (existing) {
+        // Return 200 OK if it already exists, so frontend considers it "success"
+        return res.status(200).json({ msg: 'Already in wishlist', item: existing });
+    }
 
     const newItem = new Wishlist({ userId, phoneId });
     await newItem.save();
-    res.json(newItem);
+    res.status(201).json(newItem);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Remove from wishlist (By User ID + Phone ID) - Used by Phone Cards
+app.delete('/api/wishlist/:userId/:phoneId', async (req, res) => {
+  try {
+    const result = await Wishlist.findOneAndDelete({ 
+        userId: req.params.userId, 
+        phoneId: req.params.phoneId 
+    });
+    
+    if (!result) {
+        return res.status(404).json({ msg: 'Item not found in wishlist' });
+    }
+    
+    res.json({ msg: 'Removed from wishlist' });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-// Remove from wishlist
-app.delete('/api/wishlist/:userId/:phoneId', async (req, res) => {
-  try {
-    await Wishlist.findOneAndDelete({ userId: req.params.userId, phoneId: req.params.phoneId });
-    res.json({ msg: 'Removed from wishlist' });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+// Remove from wishlist (By Wishlist Item ID) - Used by Dashboard
+app.delete('/api/wishlist/item/:id', async (req, res) => {
+    try {
+        const result = await Wishlist.findByIdAndDelete(req.params.id);
+        if (!result) {
+            return res.status(404).json({ msg: 'Wishlist item not found' });
+        }
+        res.json({ msg: 'Removed from wishlist' });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
 });
 
 const PORT = process.env.PORT || 5000;

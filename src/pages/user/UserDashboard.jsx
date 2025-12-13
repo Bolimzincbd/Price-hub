@@ -1,3 +1,4 @@
+// src/pages/user/UserDashboard.jsx
 import React, { useEffect, useState } from "react";
 import { useUser, RedirectToSignIn } from "@clerk/clerk-react";
 import Phonecard from "../card/Phonecard";
@@ -33,14 +34,22 @@ const UserDashboard = () => {
       return null;
   }
 
-  const removeFromWishlist = async (phoneId) => {
+  // Updated to delete by Wishlist Item ID (using the new route)
+  const removeFromWishlist = async (wishlistItemId) => {
     if(!window.confirm("Remove this phone from wishlist?")) return;
     
     try {
-        await fetch(`http://localhost:5000/api/wishlist/${user.id}/${phoneId}`, { method: 'DELETE' });
+        // Use the new endpoint for deleting by Wishlist ID
+        const res = await fetch(`http://localhost:5000/api/wishlist/item/${wishlistItemId}`, { method: 'DELETE' });
+        
+        if (!res.ok) throw new Error("Failed to delete");
+
         // Optimistically update UI
-        setWishlist(wishlist.filter(item => item.phoneId && item.phoneId._id !== phoneId));
-    } catch (err) { console.error(err); }
+        setWishlist(wishlist.filter(item => item._id !== wishlistItemId));
+    } catch (err) { 
+        console.error(err);
+        alert("Failed to remove item.");
+    }
   };
 
   return (
@@ -61,13 +70,25 @@ const UserDashboard = () => {
       ) : wishlist.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {wishlist.map((item) => {
-                // Ensure phone data exists (in case it was deleted from DB but remains in wishlist)
-                if (!item.phoneId) return null;
+                // Handle case where phone details are null (deleted from DB but still in wishlist)
+                if (!item.phoneId) {
+                    return (
+                        <div key={item._id} className="h-[420px] bg-gray-100 rounded-2xl border border-dashed border-gray-300 flex flex-col items-center justify-center p-6 text-center">
+                            <span className="text-gray-400 font-medium mb-4">Product Unavailable</span>
+                            <button 
+                                onClick={() => removeFromWishlist(item._id)}
+                                className="text-red-500 font-bold hover:underline text-sm"
+                            >
+                                Remove Invalid Item
+                            </button>
+                        </div>
+                    );
+                }
                 
                 return (
                     <div key={item._id} className="relative group">
                         <button 
-                            onClick={() => removeFromWishlist(item.phoneId._id)}
+                            onClick={() => removeFromWishlist(item._id)}
                             className="absolute top-2 right-2 z-20 bg-red-500 text-white w-8 h-8 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600 shadow-md cursor-pointer"
                             title="Remove from Wishlist"
                         >

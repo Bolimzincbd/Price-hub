@@ -26,75 +26,85 @@ const PhoneDetail = () => {
   // Notification State
   const [toastMessage, setToastMessage] = useState("");
 
+  // 1. Fetch Phone Data
   useEffect(() => {
     fetch(`http://localhost:5000/api/phones/${id}`)
       .then((res) => res.json())
       .then((data) => {
         setPhone(data);
         setLoading(false);
-        if (user && data._id) checkWishlistStatus(data._id);
       })
       .catch((error) => console.error("Error:", error));
-  }, [id, user]);
+  }, [id]);
 
-  // --- Helper Functions ---
+  // 2. Check Wishlist Status (Runs when user OR phone loads)
+  useEffect(() => {
+    if (user && phone?._id) {
+        fetch(`http://localhost:5000/api/wishlist/${user.id}`)
+            .then(res => res.json())
+            .then(data => {
+                // FIX: Robust Comparison
+                const exists = data.some(item => {
+                    const itemId = item.phoneId?._id || item.phoneId;
+                    return String(itemId) === String(phone._id);
+                });
+                setInWishlist(exists);
+            })
+            .catch(err => console.error(err));
+    }
+  }, [user, phone]);
 
   const showNotification = (message) => {
     setToastMessage(message);
     setTimeout(() => setToastMessage(""), 3000);
   };
 
-  const checkWishlistStatus = async (phoneId) => {
-    if (!user) return;
-    try {
-        const res = await fetch(`http://localhost:5000/api/wishlist/${user.id}`);
-        const data = await res.json();
-        // Check if current phone exists in user's wishlist
-        const exists = data.some(item => 
-          (item.phoneId && item.phoneId._id === phoneId) || item.phoneId === phoneId
-        );
-        setInWishlist(exists);
-    } catch(err) { console.error("Wishlist check error:", err); }
-  };
-
-  // --- Handlers ---
 
   const toggleWishlist = async () => {
     if (!user) return showNotification("Please login to use wishlist");
     
+    // Optimistic update backup (to revert if failed)
+    const previousState = inWishlist;
+    setInWishlist(!previousState); // Immediate UI feedback
+
     try {
-        if (inWishlist) {
-            await fetch(`http://localhost:5000/api/wishlist/${user.id}/${phone._id}`, { method: "DELETE" });
-            setInWishlist(false);
-            showNotification("Removed from Wishlist");
+        let res;
+        if (previousState) {
+            // Remove
+            res = await fetch(`http://localhost:5000/api/wishlist/${user.id}/${phone._id}`, { method: "DELETE" });
         } else {
-            await fetch(`http://localhost:5000/api/wishlist`, {
+            // Add
+            res = await fetch(`http://localhost:5000/api/wishlist`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ userId: user.id, phoneId: phone._id })
             });
-            setInWishlist(true);
-            showNotification("Added to Dashboard Wishlist");
         }
+
+        if (!res.ok) {
+            throw new Error("Failed to update wishlist");
+        }
+
+        const data = await res.json();
+        showNotification(previousState ? "Removed from Wishlist" : "Added to Wishlist");
+
     } catch (err) { 
         console.error(err); 
+        setInWishlist(previousState); // Revert on error
         showNotification("Error updating wishlist");
     }
-  };
+};
 
   const handleAddToCompare = () => {
     const currentList = JSON.parse(localStorage.getItem("compareList")) || [];
-    
     if (currentList.some(p => p._id === phone._id)) {
         showNotification("Already in comparison list");
         return;
     }
-    
     if (currentList.length >= 3) {
         showNotification("Comparison list is full (Max 3)");
         return;
     }
-    
     const newList = [...currentList, phone];
     localStorage.setItem("compareList", JSON.stringify(newList));
     showNotification("Added to Compare!");
@@ -105,8 +115,7 @@ const PhoneDetail = () => {
     if (!user) return;
     setSubmittingReview(true);
     
-    // Fallback for user name if Clerk doesn't provide full name immediately
-    const userName = user.fullName || user.firstName || user.username || "Anonymous";
+    const userName = user.fullName || user.firstName || "Anonymous";
 
     try {
         const res = await fetch(`http://localhost:5000/api/phones/${phone._id}/reviews`, {
@@ -114,17 +123,20 @@ const PhoneDetail = () => {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
                 user: userName,
-                rating: reviewForm.rating,
+                rating: Number(reviewForm.rating),
                 comment: reviewForm.comment
             })
         });
 
-        if (!res.ok) throw new Error("Failed to submit review");
+        // FIX: Check if request was successful
+        if (!res.ok) {
+            throw new Error("Failed to submit review");
+        }
 
         const updatedPhone = await res.json();
         setPhone(updatedPhone);
         setReviewForm({ rating: 5, comment: "" });
-        showNotification("Review Submitted Successfully!");
+        showNotification("Review Submitted!");
     } catch (err) { 
         console.error(err); 
         showNotification("Failed to submit review");
@@ -134,8 +146,7 @@ const PhoneDetail = () => {
 
   const scrollToStores = () => {
     setActiveTab("stores");
-    const section = document.getElementById("tabs-section");
-    if(section) section.scrollIntoView({ behavior: 'smooth' });
+    document.getElementById("tabs-section")?.scrollIntoView({ behavior: 'smooth' });
   };
 
   if (loading || !phone) return <div className="py-20 text-center">Loading...</div>;
@@ -143,7 +154,6 @@ const PhoneDetail = () => {
   return (
     <div className="py-12 px-4 max-w-screen-xl mx-auto font-sans relative">
       
-      {/* Toast Notification */}
       {toastMessage && (
         <div className="fixed top-24 right-5 z-50 animate-bounce transition-all">
           <div className="bg-gray-800 text-white px-6 py-3 rounded-lg shadow-2xl flex items-center gap-3 border border-gray-700">
@@ -159,11 +169,10 @@ const PhoneDetail = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-16">
-        {/* Left: Image */}
         <div className="bg-gradient-to-br from-[#f5f7fa] to-[#c3cfe2] rounded-3xl p-8 flex items-center justify-center min-h-[400px] shadow-inner relative group">
           <button 
             onClick={toggleWishlist}
-            className="absolute top-6 right-6 p-3 bg-white rounded-full shadow-lg text-xl transition-all hover:scale-110 z-10 hover:bg-red-50 cursor-pointer"
+            className="absolute top-6 right-6 p-4 bg-white rounded-full shadow-xl text-2xl transition-all hover:scale-110 z-20 hover:bg-red-50 cursor-pointer border border-gray-100"
             title={inWishlist ? "Remove from Wishlist" : "Add to Wishlist"}
           >
             {inWishlist ? <FaHeart className="text-red-500"/> : <FaRegHeart className="text-gray-400"/>}
@@ -171,7 +180,6 @@ const PhoneDetail = () => {
           <img src={getImgUrl(phone.coverImage)} alt={phone.name} className="max-h-[350px] w-auto object-contain mix-blend-multiply drop-shadow-2xl transition-transform duration-500 group-hover:scale-105" />
         </div>
 
-        {/* Right: Info */}
         <div className="flex flex-col justify-center">
           <h1 className="text-4xl md:text-5xl font-extrabold text-[#0f1419] mb-4">{phone.name}</h1>
           <div className="flex items-center gap-3 mb-6">
@@ -215,7 +223,6 @@ const PhoneDetail = () => {
         </div>
 
         <div className="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm min-h-[300px]">
-          {/* SPECS TAB */}
           {activeTab === 'specs' && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-y-4 gap-x-12 animate-fade-in">
                 {Object.entries(phone.specs || {}).map(([key, value]) => (
@@ -227,7 +234,6 @@ const PhoneDetail = () => {
             </div>
           )}
 
-          {/* REVIEWS TAB */}
           {activeTab === 'reviews' && (
             <div className="animate-fade-in">
               <div className="mb-10">
@@ -295,7 +301,6 @@ const PhoneDetail = () => {
             </div>
           )}
 
-          {/* STORES TAB */}
           {activeTab === 'stores' && (
             <div className="space-y-4 animate-fade-in">
                 {phone.stores?.length > 0 ? (
