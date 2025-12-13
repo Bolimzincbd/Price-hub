@@ -2,7 +2,14 @@ import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useUser, SignInButton, SignedIn, SignedOut } from "@clerk/clerk-react";
 import { getImgUrl } from "../../utils/getImgUrl";
-import { FaHeart, FaRegHeart, FaShoppingCart, FaExchangeAlt, FaStore } from "react-icons/fa";
+import { 
+  FaHeart, 
+  FaRegHeart, 
+  FaShoppingCart, 
+  FaExchangeAlt, 
+  FaStore, 
+  FaCheckCircle 
+} from "react-icons/fa";
 
 const PhoneDetail = () => {
   const { id } = useParams();
@@ -11,10 +18,13 @@ const PhoneDetail = () => {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("specs");
   
-  // States for new features
+  // Feature States
   const [inWishlist, setInWishlist] = useState(false);
   const [reviewForm, setReviewForm] = useState({ rating: 5, comment: "" });
   const [submittingReview, setSubmittingReview] = useState(false);
+  
+  // Notification State
+  const [toastMessage, setToastMessage] = useState("");
 
   useEffect(() => {
     fetch(`http://localhost:5000/api/phones/${id}`)
@@ -22,29 +32,40 @@ const PhoneDetail = () => {
       .then((data) => {
         setPhone(data);
         setLoading(false);
-        // Check wishlist status if user is logged in
         if (user) checkWishlistStatus(data._id);
       })
       .catch((error) => console.error("Error:", error));
   }, [id, user]);
+
+  // --- Helper Functions ---
+
+  const showNotification = (message) => {
+    setToastMessage(message);
+    // Hide after 3 seconds
+    setTimeout(() => setToastMessage(""), 3000);
+  };
 
   const checkWishlistStatus = async (phoneId) => {
     if (!user) return;
     try {
         const res = await fetch(`http://localhost:5000/api/wishlist/${user.id}`);
         const data = await res.json();
+        // Check if current phone exists in user's wishlist
         const exists = data.some(item => item.phoneId._id === phoneId || item.phoneId === phoneId);
         setInWishlist(exists);
     } catch(err) { console.error(err); }
   };
 
+  // --- Handlers ---
+
   const toggleWishlist = async () => {
-    if (!user) return alert("Please login to use wishlist");
+    if (!user) return showNotification("Please login to use wishlist");
     
     try {
         if (inWishlist) {
             await fetch(`http://localhost:5000/api/wishlist/${user.id}/${phone._id}`, { method: "DELETE" });
             setInWishlist(false);
+            showNotification("Removed from Wishlist");
         } else {
             await fetch(`http://localhost:5000/api/wishlist`, {
                 method: "POST",
@@ -52,23 +73,33 @@ const PhoneDetail = () => {
                 body: JSON.stringify({ userId: user.id, phoneId: phone._id })
             });
             setInWishlist(true);
+            showNotification("Added to Wishlist");
         }
     } catch (err) { console.error(err); }
   };
 
   const handleAddToCompare = () => {
+    // Get existing list
     const currentList = JSON.parse(localStorage.getItem("compareList")) || [];
+    
+    // Check for duplicates
     if (currentList.some(p => p._id === phone._id)) {
-        alert("Already in comparison list");
+        showNotification("Already in comparison list");
         return;
     }
+    
+    // Check limit
     if (currentList.length >= 3) {
-        alert("Comparison list full (Max 3)");
+        showNotification("Comparison list is full (Max 3)");
         return;
     }
+    
+    // Add to list
     const newList = [...currentList, phone];
     localStorage.setItem("compareList", JSON.stringify(newList));
-    alert("Added to Compare! Go to the Compare page to view.");
+    
+    // Show Success Notification
+    showNotification("Added to Compare!");
   };
 
   const handleReviewSubmit = async (e) => {
@@ -88,11 +119,11 @@ const PhoneDetail = () => {
         const updatedPhone = await res.json();
         setPhone(updatedPhone);
         setReviewForm({ rating: 5, comment: "" });
+        showNotification("Review Submitted!");
     } catch (err) { console.error(err); }
     setSubmittingReview(false);
   };
 
-  // Scroll to stores section
   const scrollToStores = () => {
     setActiveTab("stores");
     document.getElementById("tabs-section").scrollIntoView({ behavior: 'smooth' });
@@ -101,23 +132,39 @@ const PhoneDetail = () => {
   if (loading || !phone) return <div className="py-20 text-center">Loading...</div>;
 
   return (
-    <div className="py-12 px-4 max-w-screen-xl mx-auto font-sans">
+    <div className="py-12 px-4 max-w-screen-xl mx-auto font-sans relative">
+      
+      {/* Toast Notification Component */}
+      {toastMessage && (
+        <div className="fixed top-24 right-5 z-50 animate-bounce">
+          <div className="bg-gray-800 text-white px-6 py-3 rounded-lg shadow-2xl flex items-center gap-3">
+            <FaCheckCircle className="text-green-400 text-lg" />
+            <span className="font-semibold">{toastMessage}</span>
+          </div>
+        </div>
+      )}
+
+      {/* Main Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-16">
         {/* Left: Image */}
-        <div className="bg-gradient-to-br from-[#f5f7fa] to-[#c3cfe2] rounded-3xl p-8 flex items-center justify-center min-h-[400px] shadow-inner relative">
+        <div className="bg-gradient-to-br from-[#f5f7fa] to-[#c3cfe2] rounded-3xl p-8 flex items-center justify-center min-h-[400px] shadow-inner relative group">
           <button 
             onClick={toggleWishlist}
-            className="absolute top-6 right-6 p-3 bg-white rounded-full shadow-lg text-xl transition-all hover:scale-110 z-10"
+            className="absolute top-6 right-6 p-3 bg-white rounded-full shadow-lg text-xl transition-all hover:scale-110 z-10 hover:bg-red-50"
+            title="Add to Wishlist"
           >
             {inWishlist ? <FaHeart className="text-red-500"/> : <FaRegHeart className="text-gray-400"/>}
           </button>
-          <img src={getImgUrl(phone.coverImage)} alt={phone.name} className="max-h-[350px] w-auto object-contain mix-blend-multiply drop-shadow-2xl" />
+          <img src={getImgUrl(phone.coverImage)} alt={phone.name} className="max-h-[350px] w-auto object-contain mix-blend-multiply drop-shadow-2xl transition-transform duration-500 group-hover:scale-105" />
         </div>
 
         {/* Right: Info */}
         <div className="flex flex-col justify-center">
           <h1 className="text-4xl md:text-5xl font-extrabold text-[#0f1419] mb-4">{phone.name}</h1>
-          <div className="text-3xl font-bold text-[#667eea] mb-6">${phone.price}</div>
+          <div className="flex items-center gap-3 mb-6">
+             <div className="text-3xl font-bold text-[#667eea]">${phone.price}</div>
+             {phone.latest && <span className="bg-blue-100 text-blue-600 px-3 py-1 rounded-full text-xs font-bold uppercase">Latest</span>}
+          </div>
           
           <div className="flex gap-4 mb-8">
             <button onClick={scrollToStores} className="flex-1 bg-gradient-to-br from-[#667eea] to-[#764ba2] text-white font-bold py-4 rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all flex items-center justify-center gap-2">
@@ -131,37 +178,37 @@ const PhoneDetail = () => {
           <div className="bg-gray-50 p-6 rounded-2xl border border-gray-100">
             <h3 className="font-bold mb-4 text-gray-700">Quick Specs</h3>
             <div className="grid grid-cols-2 gap-4 text-sm">
-                <div><span className="text-gray-400 block text-xs uppercase">Processor</span> <span className="font-semibold">{phone.specs?.processor}</span></div>
-                <div><span className="text-gray-400 block text-xs uppercase">RAM</span> <span className="font-semibold">{phone.specs?.ram}</span></div>
-                <div><span className="text-gray-400 block text-xs uppercase">Storage</span> <span className="font-semibold">{phone.specs?.storage}</span></div>
-                <div><span className="text-gray-400 block text-xs uppercase">Camera</span> <span className="font-semibold">{phone.specs?.camera}</span></div>
+                <div><span className="text-gray-400 block text-xs uppercase font-bold">Processor</span> <span className="font-semibold">{phone.specs?.processor || "N/A"}</span></div>
+                <div><span className="text-gray-400 block text-xs uppercase font-bold">RAM</span> <span className="font-semibold">{phone.specs?.ram || "N/A"}</span></div>
+                <div><span className="text-gray-400 block text-xs uppercase font-bold">Storage</span> <span className="font-semibold">{phone.specs?.storage || "N/A"}</span></div>
+                <div><span className="text-gray-400 block text-xs uppercase font-bold">Camera</span> <span className="font-semibold">{phone.specs?.camera || "N/A"}</span></div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Tabs */}
+      {/* Tabs Section */}
       <div id="tabs-section">
-        <div className="flex border-b border-gray-200 mb-8 overflow-x-auto">
+        <div className="flex border-b border-gray-200 mb-8 overflow-x-auto no-scrollbar">
           {['specs', 'reviews', 'stores'].map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`px-8 py-4 font-bold text-sm uppercase tracking-wider border-b-2 transition-colors ${activeTab === tab ? "border-[#667eea] text-[#667eea]" : "border-transparent text-gray-400"}`}
+              className={`px-8 py-4 font-bold text-sm uppercase tracking-wider border-b-2 transition-colors whitespace-nowrap ${activeTab === tab ? "border-[#667eea] text-[#667eea]" : "border-transparent text-gray-400 hover:text-gray-600"}`}
             >
-              {tab}
+              {tab === 'specs' ? 'Specifications' : tab}
             </button>
           ))}
         </div>
 
-        <div className="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm">
+        <div className="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm min-h-[300px]">
           {/* SPECS TAB */}
           {activeTab === 'specs' && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-y-4 gap-x-12">
-                {Object.entries(phone.specs).map(([key, value]) => (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-y-4 gap-x-12 animate-fade-in">
+                {Object.entries(phone.specs || {}).map(([key, value]) => (
                   <div key={key} className="flex justify-between py-3 border-b border-gray-100">
-                    <span className="text-gray-500 capitalize">{key}</span>
-                    <span className="font-semibold text-gray-900">{value}</span>
+                    <span className="text-gray-500 capitalize font-medium">{key}</span>
+                    <span className="font-semibold text-gray-900 text-right">{value}</span>
                   </div>
                 ))}
             </div>
@@ -169,42 +216,43 @@ const PhoneDetail = () => {
 
           {/* REVIEWS TAB */}
           {activeTab === 'reviews' && (
-            <div>
+            <div className="animate-fade-in">
               <div className="mb-10">
                 <h3 className="text-xl font-bold mb-4">Write a Review</h3>
                 <SignedIn>
-                    <form onSubmit={handleReviewSubmit} className="bg-gray-50 p-6 rounded-xl">
-                        <div className="mb-4">
-                            <label className="block text-sm font-bold mb-2">Rating</label>
-                            <select 
-                                value={reviewForm.rating} 
-                                onChange={e => setReviewForm({...reviewForm, rating: e.target.value})}
-                                className="w-full p-2 border rounded-lg"
-                            >
-                                {[5,4,3,2,1].map(r => <option key={r} value={r}>{r} Stars</option>)}
-                            </select>
+                    <form onSubmit={handleReviewSubmit} className="bg-gray-50 p-6 rounded-xl border border-gray-100">
+                        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+                            <div className="col-span-1">
+                                <label className="block text-sm font-bold mb-2">Rating</label>
+                                <select 
+                                    value={reviewForm.rating} 
+                                    onChange={e => setReviewForm({...reviewForm, rating: e.target.value})}
+                                    className="w-full p-3 border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-[#667eea] outline-none"
+                                >
+                                    {[5,4,3,2,1].map(r => <option key={r} value={r}>{r} Stars</option>)}
+                                </select>
+                            </div>
+                            <div className="col-span-3">
+                                <label className="block text-sm font-bold mb-2">Comment</label>
+                                <input 
+                                    value={reviewForm.comment}
+                                    onChange={e => setReviewForm({...reviewForm, comment: e.target.value})}
+                                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#667eea] outline-none" 
+                                    placeholder="Share your thoughts..." 
+                                    required
+                                />
+                            </div>
                         </div>
-                        <div className="mb-4">
-                            <label className="block text-sm font-bold mb-2">Comment</label>
-                            <textarea 
-                                value={reviewForm.comment}
-                                onChange={e => setReviewForm({...reviewForm, comment: e.target.value})}
-                                className="w-full p-3 border rounded-lg" 
-                                rows="3" 
-                                placeholder="Share your thoughts..." 
-                                required
-                            />
-                        </div>
-                        <button disabled={submittingReview} type="submit" className="bg-[#667eea] text-white px-6 py-2 rounded-lg font-bold">
+                        <button disabled={submittingReview} type="submit" className="bg-[#667eea] text-white px-8 py-3 rounded-lg font-bold hover:bg-[#5a6fd6] transition-colors shadow-md">
                             {submittingReview ? "Submitting..." : "Submit Review"}
                         </button>
                     </form>
                 </SignedIn>
                 <SignedOut>
-                    <div className="bg-gray-50 p-6 rounded-xl text-center">
-                        <p className="mb-4 text-gray-500">Please login to write a review</p>
+                    <div className="bg-gray-50 p-8 rounded-xl text-center border border-dashed border-gray-300">
+                        <p className="mb-4 text-gray-500 font-medium">Please login to share your experience</p>
                         <SignInButton mode="modal">
-                            <button className="text-[#667eea] font-bold hover:underline">Login Now</button>
+                            <button className="text-[#667eea] font-bold hover:underline">Login to Review</button>
                         </SignInButton>
                     </div>
                 </SignedOut>
@@ -212,41 +260,56 @@ const PhoneDetail = () => {
 
               <h3 className="text-xl font-bold mb-6">User Reviews ({phone.reviews?.length || 0})</h3>
               <div className="space-y-6">
-                {phone.reviews?.map((review, index) => (
-                    <div key={index} className="border-b border-gray-100 pb-6 last:border-0">
-                      <div className="flex justify-between mb-2">
-                        <span className="font-bold">{review.user}</span>
-                        <span className="text-yellow-400">{"★".repeat(review.rating)}</span>
-                      </div>
-                      <p className="text-gray-600">{review.comment}</p>
-                    </div>
-                ))}
+                {phone.reviews?.length > 0 ? (
+                    phone.reviews.map((review, index) => (
+                        <div key={index} className="border-b border-gray-100 pb-6 last:border-0 last:pb-0">
+                        <div className="flex justify-between mb-2">
+                            <div className="flex items-center gap-2">
+                                <div className="w-8 h-8 bg-gradient-to-br from-gray-200 to-gray-300 rounded-full flex items-center justify-center font-bold text-gray-600 text-xs">
+                                    {review.user.charAt(0)}
+                                </div>
+                                <span className="font-bold text-gray-800">{review.user}</span>
+                            </div>
+                            <span className="text-yellow-400 text-sm">{"★".repeat(review.rating)}<span className="text-gray-200">{"★".repeat(5-review.rating)}</span></span>
+                        </div>
+                        <p className="text-gray-600 ml-10 text-sm leading-relaxed">{review.comment}</p>
+                        </div>
+                    ))
+                ) : (
+                    <p className="text-gray-400 italic">No reviews yet.</p>
+                )}
               </div>
             </div>
           )}
 
           {/* STORES TAB */}
           {activeTab === 'stores' && (
-            <div className="space-y-4">
-                {phone.stores?.map((store, index) => (
-                    <div key={index} className="flex justify-between items-center p-4 border border-gray-200 rounded-xl bg-white hover:border-[#667eea] group transition-all">
-                      <div className="flex items-center gap-4">
-                        <div className="bg-gray-100 p-3 rounded-lg text-2xl text-gray-600"><FaStore/></div>
-                        <span className="font-bold text-lg">{store.name}</span>
-                      </div>
-                      <div className="flex items-center gap-6">
-                        <span className="font-bold text-xl text-[#667eea]">${store.price}</span>
-                        <a 
-                            href={store.url} 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                            className="bg-[#667eea] text-white px-6 py-2 rounded-lg font-bold hover:bg-[#5a6fd6] transition-colors"
-                        >
-                            Go to Store
-                        </a>
-                      </div>
+            <div className="space-y-4 animate-fade-in">
+                {phone.stores?.length > 0 ? (
+                    phone.stores.map((store, index) => (
+                        <div key={index} className="flex flex-col sm:flex-row justify-between items-center p-5 border border-gray-200 rounded-xl bg-white hover:border-[#667eea] group transition-all shadow-sm">
+                        <div className="flex items-center gap-4 mb-4 sm:mb-0 w-full sm:w-auto">
+                            <div className="bg-gray-50 p-3 rounded-lg text-2xl text-[#667eea]"><FaStore/></div>
+                            <span className="font-bold text-lg text-gray-800">{store.name}</span>
+                        </div>
+                        <div className="flex items-center justify-between sm:justify-end gap-6 w-full sm:w-auto">
+                            <span className="font-bold text-2xl text-[#667eea]">${store.price}</span>
+                            <a 
+                                href={store.url} 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="bg-gray-900 text-white px-6 py-2.5 rounded-lg font-bold hover:bg-[#667eea] transition-all shadow-md transform active:scale-95"
+                            >
+                                Visit Store
+                            </a>
+                        </div>
+                        </div>
+                    ))
+                ) : (
+                    <div className="text-center py-10 text-gray-400">
+                        <p>No store listings available for this device.</p>
                     </div>
-                ))}
+                )}
             </div>
           )}
         </div>
