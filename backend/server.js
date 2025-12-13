@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const Phone = require('./models/Phone');
-const Wishlist = require('./models/Wishlist'); // Import Wishlist
+const Wishlist = require('./models/Wishlist'); // Ensure this model exists
 
 dotenv.config();
 const app = express();
@@ -15,7 +15,9 @@ mongoose.connect(process.env.MONGODB_URI)
   .then(() => console.log('MongoDB Connected'))
   .catch(err => console.log(err));
 
-// --- EXISTING ROUTES (GET/POST/PUT/DELETE Phones) ---
+// --- PHONE ROUTES ---
+
+// GET ALL
 app.get('/api/phones', async (req, res) => {
   try {
     const phones = await Phone.find();
@@ -25,6 +27,7 @@ app.get('/api/phones', async (req, res) => {
   }
 });
 
+// GET ONE
 app.get('/api/phones/:id', async (req, res) => {
   try {
     const phone = await Phone.findById(req.params.id);
@@ -35,6 +38,7 @@ app.get('/api/phones/:id', async (req, res) => {
   }
 });
 
+// CREATE PHONE
 app.post('/api/phones', async (req, res) => {
   try {
     const newPhone = new Phone(req.body);
@@ -45,6 +49,7 @@ app.post('/api/phones', async (req, res) => {
   }
 });
 
+// UPDATE PHONE
 app.put('/api/phones/:id', async (req, res) => {
   try {
     const updatedPhone = await Phone.findByIdAndUpdate(req.params.id, req.body, { new: true });
@@ -54,6 +59,7 @@ app.put('/api/phones/:id', async (req, res) => {
   }
 });
 
+// DELETE PHONE
 app.delete('/api/phones/:id', async (req, res) => {
   try {
     await Phone.findByIdAndDelete(req.params.id);
@@ -63,11 +69,14 @@ app.delete('/api/phones/:id', async (req, res) => {
   }
 });
 
-// --- NEW ROUTES ---
-
-// 1. ADD REVIEW
+// --- REVIEW ROUTE (FIXED) ---
 app.post('/api/phones/:id/reviews', async (req, res) => {
   const { user, rating, comment } = req.body;
+  
+  if (!user || !rating || !comment) {
+    return res.status(400).json({ msg: "Please provide user, rating, and comment" });
+  }
+
   try {
     const phone = await Phone.findById(req.params.id);
     if (!phone) return res.status(404).json({ msg: 'Phone not found' });
@@ -81,16 +90,19 @@ app.post('/api/phones/:id/reviews', async (req, res) => {
     phone.reviewCount = phone.reviews.length;
 
     await phone.save();
-    res.json(phone);
+    res.json(phone); // Return updated phone object
   } catch (err) {
+    console.error("Review Error:", err);
     res.status(500).json({ error: err.message });
   }
 });
 
-// 2. WISHLIST ROUTES
+// --- WISHLIST ROUTES ---
+
 // Get user wishlist
 app.get('/api/wishlist/:userId', async (req, res) => {
   try {
+    // Populate phone details so we can display them
     const wishlist = await Wishlist.find({ userId: req.params.userId }).populate('phoneId');
     res.json(wishlist);
   } catch (err) {
@@ -102,6 +114,7 @@ app.get('/api/wishlist/:userId', async (req, res) => {
 app.post('/api/wishlist', async (req, res) => {
   const { userId, phoneId } = req.body;
   try {
+    // Check if already exists
     const existing = await Wishlist.findOne({ userId, phoneId });
     if (existing) return res.status(400).json({ msg: 'Already in wishlist' });
 

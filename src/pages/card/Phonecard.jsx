@@ -1,13 +1,67 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { getImgUrl } from "../../utils/getImgUrl";
 import { Link } from "react-router-dom";
-import { FaMemory, FaHdd, FaBatteryFull } from "react-icons/fa";
+import { FaMemory, FaHdd, FaBatteryFull, FaHeart, FaRegHeart } from "react-icons/fa";
+import { useUser } from "@clerk/clerk-react";
 
 const Phonecard = ({ phone }) => {
+  const { user } = useUser();
+  const [inWishlist, setInWishlist] = useState(false);
+
+  // Check if this phone is in wishlist on load
+  useEffect(() => {
+    if (user && phone?._id) {
+      fetch(`http://localhost:5000/api/wishlist/${user.id}`)
+        .then((res) => res.json())
+        .then((data) => {
+          const exists = data.some((item) => 
+            (item.phoneId && item.phoneId._id === phone._id) || item.phoneId === phone._id
+          );
+          setInWishlist(exists);
+        })
+        .catch((err) => console.error(err));
+    }
+  }, [user, phone]);
+
+  const toggleWishlist = async (e) => {
+    e.preventDefault(); // Prevent navigating to details page
+    e.stopPropagation(); 
+
+    if (!user) {
+      alert("Please login to use wishlist");
+      return;
+    }
+
+    try {
+      if (inWishlist) {
+        await fetch(`http://localhost:5000/api/wishlist/${user.id}/${phone._id}`, { method: "DELETE" });
+        setInWishlist(false);
+      } else {
+        await fetch(`http://localhost:5000/api/wishlist`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ userId: user.id, phoneId: phone._id }),
+        });
+        setInWishlist(true);
+      }
+    } catch (error) {
+      console.error("Wishlist error:", error);
+    }
+  };
+
   return (
     <div className="bg-white rounded-2xl border border-gray-200 p-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:border-[#667eea] group h-full flex flex-col cursor-pointer relative">
       
-      {/* Badge for Latest/Recommended */}
+      {/* --- WISHLIST BUTTON (Top Right) --- */}
+      <button
+        onClick={toggleWishlist}
+        className="absolute top-4 right-4 z-20 p-2 bg-white rounded-full shadow-md text-lg transition-transform hover:scale-110 hover:bg-red-50 text-gray-400"
+        title={inWishlist ? "Remove from Wishlist" : "Add to Wishlist"}
+      >
+        {inWishlist ? <FaHeart className="text-red-500" /> : <FaRegHeart />}
+      </button>
+
+      {/* Badge for Latest */}
       {phone.latest && (
         <span className="absolute top-4 left-4 z-10 bg-blue-100 text-blue-600 text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-wide">
           New

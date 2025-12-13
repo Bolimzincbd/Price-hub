@@ -32,7 +32,7 @@ const PhoneDetail = () => {
       .then((data) => {
         setPhone(data);
         setLoading(false);
-        if (user) checkWishlistStatus(data._id);
+        if (user && data._id) checkWishlistStatus(data._id);
       })
       .catch((error) => console.error("Error:", error));
   }, [id, user]);
@@ -41,7 +41,6 @@ const PhoneDetail = () => {
 
   const showNotification = (message) => {
     setToastMessage(message);
-    // Hide after 3 seconds
     setTimeout(() => setToastMessage(""), 3000);
   };
 
@@ -51,9 +50,11 @@ const PhoneDetail = () => {
         const res = await fetch(`http://localhost:5000/api/wishlist/${user.id}`);
         const data = await res.json();
         // Check if current phone exists in user's wishlist
-        const exists = data.some(item => item.phoneId._id === phoneId || item.phoneId === phoneId);
+        const exists = data.some(item => 
+          (item.phoneId && item.phoneId._id === phoneId) || item.phoneId === phoneId
+        );
         setInWishlist(exists);
-    } catch(err) { console.error(err); }
+    } catch(err) { console.error("Wishlist check error:", err); }
   };
 
   // --- Handlers ---
@@ -73,32 +74,29 @@ const PhoneDetail = () => {
                 body: JSON.stringify({ userId: user.id, phoneId: phone._id })
             });
             setInWishlist(true);
-            showNotification("Added to Wishlist");
+            showNotification("Added to Dashboard Wishlist");
         }
-    } catch (err) { console.error(err); }
+    } catch (err) { 
+        console.error(err); 
+        showNotification("Error updating wishlist");
+    }
   };
 
   const handleAddToCompare = () => {
-    // Get existing list
     const currentList = JSON.parse(localStorage.getItem("compareList")) || [];
     
-    // Check for duplicates
     if (currentList.some(p => p._id === phone._id)) {
         showNotification("Already in comparison list");
         return;
     }
     
-    // Check limit
     if (currentList.length >= 3) {
         showNotification("Comparison list is full (Max 3)");
         return;
     }
     
-    // Add to list
     const newList = [...currentList, phone];
     localStorage.setItem("compareList", JSON.stringify(newList));
-    
-    // Show Success Notification
     showNotification("Added to Compare!");
   };
 
@@ -106,27 +104,38 @@ const PhoneDetail = () => {
     e.preventDefault();
     if (!user) return;
     setSubmittingReview(true);
+    
+    // Fallback for user name if Clerk doesn't provide full name immediately
+    const userName = user.fullName || user.firstName || user.username || "Anonymous";
+
     try {
         const res = await fetch(`http://localhost:5000/api/phones/${phone._id}/reviews`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-                user: user.fullName || user.firstName,
+                user: userName,
                 rating: reviewForm.rating,
                 comment: reviewForm.comment
             })
         });
+
+        if (!res.ok) throw new Error("Failed to submit review");
+
         const updatedPhone = await res.json();
         setPhone(updatedPhone);
         setReviewForm({ rating: 5, comment: "" });
-        showNotification("Review Submitted!");
-    } catch (err) { console.error(err); }
+        showNotification("Review Submitted Successfully!");
+    } catch (err) { 
+        console.error(err); 
+        showNotification("Failed to submit review");
+    }
     setSubmittingReview(false);
   };
 
   const scrollToStores = () => {
     setActiveTab("stores");
-    document.getElementById("tabs-section").scrollIntoView({ behavior: 'smooth' });
+    const section = document.getElementById("tabs-section");
+    if(section) section.scrollIntoView({ behavior: 'smooth' });
   };
 
   if (loading || !phone) return <div className="py-20 text-center">Loading...</div>;
@@ -134,24 +143,28 @@ const PhoneDetail = () => {
   return (
     <div className="py-12 px-4 max-w-screen-xl mx-auto font-sans relative">
       
-      {/* Toast Notification Component */}
+      {/* Toast Notification */}
       {toastMessage && (
-        <div className="fixed top-24 right-5 z-50 animate-bounce">
-          <div className="bg-gray-800 text-white px-6 py-3 rounded-lg shadow-2xl flex items-center gap-3">
+        <div className="fixed top-24 right-5 z-50 animate-bounce transition-all">
+          <div className="bg-gray-800 text-white px-6 py-3 rounded-lg shadow-2xl flex items-center gap-3 border border-gray-700">
             <FaCheckCircle className="text-green-400 text-lg" />
             <span className="font-semibold">{toastMessage}</span>
           </div>
         </div>
       )}
 
-      {/* Main Grid */}
+      {/* Breadcrumb */}
+      <div className="mb-8 text-sm text-gray-500">
+        <Link to="/" className="hover:text-[#667eea]">Home</Link> / <span className="font-semibold text-gray-800">{phone.name}</span>
+      </div>
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-16">
         {/* Left: Image */}
         <div className="bg-gradient-to-br from-[#f5f7fa] to-[#c3cfe2] rounded-3xl p-8 flex items-center justify-center min-h-[400px] shadow-inner relative group">
           <button 
             onClick={toggleWishlist}
-            className="absolute top-6 right-6 p-3 bg-white rounded-full shadow-lg text-xl transition-all hover:scale-110 z-10 hover:bg-red-50"
-            title="Add to Wishlist"
+            className="absolute top-6 right-6 p-3 bg-white rounded-full shadow-lg text-xl transition-all hover:scale-110 z-10 hover:bg-red-50 cursor-pointer"
+            title={inWishlist ? "Remove from Wishlist" : "Add to Wishlist"}
           >
             {inWishlist ? <FaHeart className="text-red-500"/> : <FaRegHeart className="text-gray-400"/>}
           </button>
@@ -167,10 +180,10 @@ const PhoneDetail = () => {
           </div>
           
           <div className="flex gap-4 mb-8">
-            <button onClick={scrollToStores} className="flex-1 bg-gradient-to-br from-[#667eea] to-[#764ba2] text-white font-bold py-4 rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all flex items-center justify-center gap-2">
+            <button onClick={scrollToStores} className="flex-1 bg-gradient-to-br from-[#667eea] to-[#764ba2] text-white font-bold py-4 rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all flex items-center justify-center gap-2 cursor-pointer">
               <FaShoppingCart /> Buy Now
             </button>
-            <button onClick={handleAddToCompare} className="flex-1 bg-white text-[#667eea] border-2 border-[#667eea] font-bold py-4 rounded-xl hover:bg-indigo-50 transition-all flex items-center justify-center gap-2">
+            <button onClick={handleAddToCompare} className="flex-1 bg-white text-[#667eea] border-2 border-[#667eea] font-bold py-4 rounded-xl hover:bg-indigo-50 transition-all flex items-center justify-center gap-2 cursor-pointer">
               <FaExchangeAlt /> Compare
             </button>
           </div>
@@ -243,7 +256,7 @@ const PhoneDetail = () => {
                                 />
                             </div>
                         </div>
-                        <button disabled={submittingReview} type="submit" className="bg-[#667eea] text-white px-8 py-3 rounded-lg font-bold hover:bg-[#5a6fd6] transition-colors shadow-md">
+                        <button disabled={submittingReview} type="submit" className="bg-[#667eea] text-white px-8 py-3 rounded-lg font-bold hover:bg-[#5a6fd6] transition-colors shadow-md cursor-pointer disabled:opacity-50">
                             {submittingReview ? "Submitting..." : "Submit Review"}
                         </button>
                     </form>
@@ -252,7 +265,7 @@ const PhoneDetail = () => {
                     <div className="bg-gray-50 p-8 rounded-xl text-center border border-dashed border-gray-300">
                         <p className="mb-4 text-gray-500 font-medium">Please login to share your experience</p>
                         <SignInButton mode="modal">
-                            <button className="text-[#667eea] font-bold hover:underline">Login to Review</button>
+                            <button className="text-[#667eea] font-bold hover:underline cursor-pointer">Login to Review</button>
                         </SignInButton>
                     </div>
                 </SignedOut>
@@ -266,9 +279,9 @@ const PhoneDetail = () => {
                         <div className="flex justify-between mb-2">
                             <div className="flex items-center gap-2">
                                 <div className="w-8 h-8 bg-gradient-to-br from-gray-200 to-gray-300 rounded-full flex items-center justify-center font-bold text-gray-600 text-xs">
-                                    {review.user.charAt(0)}
+                                    {review.user ? review.user.charAt(0) : "A"}
                                 </div>
-                                <span className="font-bold text-gray-800">{review.user}</span>
+                                <span className="font-bold text-gray-800">{review.user || "Anonymous"}</span>
                             </div>
                             <span className="text-yellow-400 text-sm">{"★".repeat(review.rating)}<span className="text-gray-200">{"★".repeat(5-review.rating)}</span></span>
                         </div>
