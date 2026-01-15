@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { getImgUrl } from "../../utils/getImgUrl";
 import { Link } from "react-router-dom";
-import { FaMemory, FaHdd, FaBatteryFull, FaHeart, FaRegHeart } from "react-icons/fa";
+import { FaHeart, FaRegHeart } from "react-icons/fa";
 import { useUser } from "@clerk/clerk-react";
 
 const Phonecard = ({ phone }) => {
@@ -14,9 +14,7 @@ const Phonecard = ({ phone }) => {
       fetch(`http://localhost:5000/api/wishlist/${user.id}`)
         .then((res) => res.json())
         .then((data) => {
-          // FIX: Convert both IDs to String() to ensure they match
           const exists = data.some((item) => {
-             // item.phoneId might be an object (populated) or string (id only)
              const itemId = item.phoneId?._id || item.phoneId;
              return String(itemId) === String(phone._id);
           });
@@ -26,7 +24,7 @@ const Phonecard = ({ phone }) => {
     }
   }, [user, phone]);
 
-const toggleWishlist = async (e) => {
+  const toggleWishlist = async (e) => {
     e.preventDefault(); 
     e.stopPropagation(); 
 
@@ -36,7 +34,7 @@ const toggleWishlist = async (e) => {
     }
 
     const previousState = inWishlist;
-    setInWishlist(!previousState); // Optimistic UI update
+    setInWishlist(!previousState);
 
     try {
       let res;
@@ -50,13 +48,10 @@ const toggleWishlist = async (e) => {
         });
       }
 
-      if (!res.ok) {
-        throw new Error("Request failed");
-      }
+      if (!res.ok) throw new Error("Request failed");
     } catch (error) {
       console.error("Wishlist error:", error);
-      setInWishlist(previousState); // Revert state on failure
-      alert("Could not update wishlist");
+      setInWishlist(previousState);
     }
   };
 
@@ -80,7 +75,7 @@ const toggleWishlist = async (e) => {
       )}
 
       {/* Image Container */}
-      <div className="bg-gradient-to-br from-[#f5f7fa] to-[#c3cfe2] rounded-xl mb-4 flex items-center justify-center p-6 h-56 relative overflow-hidden">
+      <div className="bg-gradient-to-br from-[#f5f7fa] to-[#c3cfe2] rounded-xl mb-4 flex items-center justify-center p-6 h-48 sm:h-56 relative overflow-hidden">
         <Link to={`/phones/${phone._id}`} className="w-full h-full flex items-center justify-center">
           <img
             src={getImgUrl(phone.coverImage)}
@@ -105,19 +100,19 @@ const toggleWishlist = async (e) => {
           </h3>
         </Link>
         
-        {/* Specs Grid */}
-        <div className="grid grid-cols-3 gap-2 mb-4 text-[10px] text-gray-500">
-            <div className="flex flex-col items-center bg-gray-50 p-1.5 rounded-lg">
-                <FaMemory className="mb-1 text-[#667eea]" />
-                <span className="truncate w-full text-center">{phone.specs?.ram || "-"}</span>
+        {/* TEXT SPECS (Reverted from Icons) */}
+        <div className="flex flex-col gap-1 mb-4 text-xs text-gray-600 bg-gray-50 p-3 rounded-lg">
+            <div className="flex justify-between">
+                <span className="text-gray-400">RAM:</span>
+                <span className="font-semibold">{phone.specs?.ram || "N/A"}</span>
             </div>
-            <div className="flex flex-col items-center bg-gray-50 p-1.5 rounded-lg">
-                <FaHdd className="mb-1 text-[#667eea]" />
-                <span className="truncate w-full text-center">{phone.specs?.storage?.split('/')[0] || "-"}</span>
+            <div className="flex justify-between">
+                <span className="text-gray-400">Storage:</span>
+                <span className="font-semibold">{phone.specs?.storage?.split('/')[0] || "N/A"}</span>
             </div>
-            <div className="flex flex-col items-center bg-gray-50 p-1.5 rounded-lg">
-                <FaBatteryFull className="mb-1 text-[#667eea]" />
-                <span className="truncate w-full text-center">{phone.specs?.battery || "-"}</span>
+            <div className="flex justify-between">
+                <span className="text-gray-400">Battery:</span>
+                <span className="font-semibold">{phone.specs?.battery || "N/A"}</span>
             </div>
         </div>
 

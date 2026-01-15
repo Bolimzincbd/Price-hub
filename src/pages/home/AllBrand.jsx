@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import Phonecard from "../card/Phonecard";
+import ScrollList from "../../components/ScrollList"; // Imported ScrollList
 import { FaFilter } from "react-icons/fa";
 
 const AllBrand = () => {
@@ -16,12 +16,21 @@ const AllBrand = () => {
     fetch("http://localhost:5000/api/phones")
       .then((res) => res.json())
       .then((data) => {
-        setPhones(data);
-        setFilteredPhones(data); // Initialize filtered list
+        // Safety check: ensure data is an array
+        if (Array.isArray(data)) {
+            setPhones(data);
+            setFilteredPhones(data);
+        } else {
+            console.error("API Error: Expected array but got", data);
+            setPhones([]);
+            setFilteredPhones([]);
+        }
         setLoading(false);
       })
       .catch((error) => {
         console.error("Error loading phones:", error);
+        setPhones([]);
+        setFilteredPhones([]);
         setLoading(false);
       });
   }, []);
@@ -128,7 +137,7 @@ const AllBrand = () => {
         </div>
       </div>
 
-      {/* Product Grid */}
+      {/* Sliding Product List (Replaced Grid) */}
       <div className="w-full">
           {filteredPhones.length === 0 ? (
             <div className="h-64 flex flex-col items-center justify-center text-gray-400 bg-gray-50 rounded-2xl border border-dashed border-gray-300">
@@ -136,13 +145,8 @@ const AllBrand = () => {
                 <button onClick={() => {setPriceRange(2000); setSelectedBrand("All"); setMinRam(0)}} className="mt-4 text-[#667eea] font-bold hover:underline">Reset Filters</button>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {filteredPhones.map((phone) => (
-                <div key={phone._id} className="h-[420px]">
-                    <Phonecard phone={phone} />
-                </div>
-              ))}
-            </div>
+            // Use ScrollList to slide items horizontally
+            <ScrollList items={filteredPhones} />
           )}
       </div>
     </div>
