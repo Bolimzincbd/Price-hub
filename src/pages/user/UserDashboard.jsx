@@ -1,14 +1,38 @@
-// src/pages/user/UserDashboard.jsx
 import React, { useEffect, useState } from "react";
 import { useUser, RedirectToSignIn } from "@clerk/clerk-react";
+import { useNavigate } from "react-router-dom";
 import Phonecard from "../card/Phonecard";
 
 const UserDashboard = () => {
   const { isLoaded, isSignedIn, user } = useUser();
+  const navigate = useNavigate();
   const [wishlist, setWishlist] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Fetch Wishlist
+  // --- AUTO REDIRECT ADMINS ---
+  useEffect(() => {
+    if (isLoaded && user) {
+        const email = user.primaryEmailAddress.emailAddress;
+        
+        // 1. Check Main Admin
+        if (email === "mooneweea@gmail.com") {
+            navigate("/admin-dashboard");
+            return;
+        }
+
+        // 2. Check Sub Admin
+        fetch("http://localhost:5000/api/admins")
+            .then(res => res.json())
+            .then(data => {
+                if (data.some(admin => admin.email === email)) {
+                    navigate("/admin-dashboard");
+                }
+            })
+            .catch(err => console.error(err));
+    }
+  }, [isLoaded, user, navigate]);
+
+  // --- FETCH WISHLIST ---
   useEffect(() => {
     if (user) {
       fetch(`http://localhost:5000/api/wishlist/${user.id}`)
@@ -27,34 +51,17 @@ const UserDashboard = () => {
   if (!isLoaded) return <div>Loading...</div>;
   if (!isSignedIn) return <RedirectToSignIn />;
 
-  // Admin Redirect
-  const ADMIN_EMAIL = "mooneweea@gmail.com"; 
-  if (user?.primaryEmailAddress?.emailAddress === ADMIN_EMAIL) {
-      window.location.href = "/admin-dashboard";
-      return null;
-  }
-
-  // Updated to delete by Wishlist Item ID (using the new route)
   const removeFromWishlist = async (wishlistItemId) => {
     if(!window.confirm("Remove this phone from wishlist?")) return;
-    
     try {
-        // Use the new endpoint for deleting by Wishlist ID
         const res = await fetch(`http://localhost:5000/api/wishlist/item/${wishlistItemId}`, { method: 'DELETE' });
-        
         if (!res.ok) throw new Error("Failed to delete");
-
-        // Optimistically update UI
         setWishlist(wishlist.filter(item => item._id !== wishlistItemId));
-    } catch (err) { 
-        console.error(err);
-        alert("Failed to remove item.");
-    }
+    } catch (err) { console.error(err); alert("Failed to remove item."); }
   };
 
   return (
     <div className="max-w-screen-2xl mx-auto py-12 px-6 font-sans">
-      {/* Header Profile */}
       <div className="bg-gradient-to-r from-[#667eea] to-[#764ba2] rounded-2xl p-8 mb-12 text-white flex flex-col md:flex-row items-center gap-6 shadow-lg">
         <img src={user.imageUrl} alt="Profile" className="w-20 h-20 rounded-full border-4 border-white/30" />
         <div className="text-center md:text-left">
@@ -70,27 +77,10 @@ const UserDashboard = () => {
       ) : wishlist.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {wishlist.map((item) => {
-                // Handle case where phone details are null (deleted from DB but still in wishlist)
-                if (!item.phoneId) {
-                    return (
-                        <div key={item._id} className="h-[420px] bg-gray-100 rounded-2xl border border-dashed border-gray-300 flex flex-col items-center justify-center p-6 text-center">
-                            <span className="text-gray-400 font-medium mb-4">Product Unavailable</span>
-                            <button 
-                                onClick={() => removeFromWishlist(item._id)}
-                                className="text-red-500 font-bold hover:underline text-sm"
-                            >
-                                Remove Invalid Item
-                            </button>
-                        </div>
-                    );
-                }
-                
+                if (!item.phoneId) return null;
                 return (
                     <div key={item._id} className="relative group">
-                        {/* REMOVED: The red 'X' button was here */}
-                        
                         <div className="h-[420px]">
-                            {/* The Phonecard itself will handle interactions now */}
                             <Phonecard phone={item.phoneId} />
                         </div>
                     </div>
