@@ -28,11 +28,12 @@ const phoneSchema = new mongoose.Schema({
       comment: String,
     }
   ],
+  // This section allows multiple stores per phone
   stores: [
     {
-      name: String,
-      price: Number,
-      url: String,
+      name: String,   // e.g. "Amazon"
+      price: Number,  // e.g. 999
+      url: String,    // e.g. "https://amazon.com/..."
     }
   ]
 });

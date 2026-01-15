@@ -7,9 +7,9 @@ const AdminDashboard = () => {
   const { user, isSignedIn } = useUser();
   const [phones, setPhones] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingId, setEditingId] = useState(null); // Track if we are editing or adding
+  const [editingId, setEditingId] = useState(null);
 
-  // Initial State for resetting the form
+  // Initial Form State
   const initialFormState = {
     name: "", 
     price: "", 
@@ -26,7 +26,8 @@ const AdminDashboard = () => {
       storage: "",
       battery: "",
       camera: ""
-    }
+    },
+    stores: [] // Initialize empty stores array
   };
 
   const [formData, setFormData] = useState(initialFormState);
@@ -46,14 +47,12 @@ const AdminDashboard = () => {
 
   // --- HANDLERS ---
 
-  // Open Modal for NEW Phone
   const handleOpenAdd = () => {
     setEditingId(null);
     setFormData(initialFormState);
     setIsModalOpen(true);
   };
 
-  // Open Modal for EDITING Phone
   const handleOpenEdit = (phone) => {
     setEditingId(phone._id);
     setFormData({
@@ -72,7 +71,8 @@ const AdminDashboard = () => {
         storage: phone.specs?.storage || "",
         battery: phone.specs?.battery || "",
         camera: phone.specs?.camera || "",
-      }
+      },
+      stores: phone.stores || [] // Load existing stores
     });
     setIsModalOpen(true);
   };
@@ -105,11 +105,29 @@ const AdminDashboard = () => {
     }));
   };
 
-  // Unified Submit Handler (Add or Update)
+  // --- STORE MANAGEMENT HANDLERS ---
+  const handleStoreChange = (index, field, value) => {
+    const updatedStores = [...formData.stores];
+    updatedStores[index][field] = value;
+    setFormData({ ...formData, stores: updatedStores });
+  };
+
+  const addStore = () => {
+    setFormData({
+      ...formData,
+      stores: [...formData.stores, { name: "", price: "", url: "" }]
+    });
+  };
+
+  const removeStore = (index) => {
+    const updatedStores = formData.stores.filter((_, i) => i !== index);
+    setFormData({ ...formData, stores: updatedStores });
+  };
+
+  // Unified Submit Handler
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    // Determine URL and Method based on editingId
     const url = editingId 
       ? `http://localhost:5000/api/phones/${editingId}`
       : 'http://localhost:5000/api/phones';
@@ -127,7 +145,6 @@ const AdminDashboard = () => {
       
       const savedPhone = await res.json();
 
-      // Update Local State
       if (editingId) {
         setPhones(phones.map(p => p._id === editingId ? savedPhone : p));
       } else {
@@ -149,7 +166,6 @@ const AdminDashboard = () => {
         <h2 className="text-2xl font-bold mb-8 text-[#667eea]">Admin Panel</h2>
         <div className="space-y-2">
           <button className="w-full text-left p-3 bg-[#667eea] rounded-lg font-medium">Manage Phones</button>
-          {/* Add more sidebar items here later */}
         </div>
       </div>
 
@@ -293,6 +309,60 @@ const AdminDashboard = () => {
                     </div>
                   ))}
                 </div>
+              </div>
+
+              {/* --- NEW: STORE MANAGEMENT SECTION --- */}
+              <div className="border-t border-gray-200 pt-6 mt-2">
+                <h3 className="text-lg font-bold text-[#667eea] mb-4">Store Links</h3>
+                <div className="space-y-3">
+                  {formData.stores.map((store, index) => (
+                    <div key={index} className="flex flex-col md:flex-row gap-3 items-end bg-gray-50 p-3 rounded-lg border border-gray-200">
+                        <div className="flex-1 w-full">
+                            <label className="block text-xs font-bold mb-1 text-gray-500 uppercase">Store Name</label>
+                            <input 
+                                placeholder="e.g. Amazon" 
+                                value={store.name}
+                                onChange={(e) => handleStoreChange(index, "name", e.target.value)}
+                                className="w-full border border-gray-300 p-2 rounded focus:outline-none focus:border-[#667eea]"
+                            />
+                        </div>
+                        <div className="w-full md:w-32">
+                            <label className="block text-xs font-bold mb-1 text-gray-500 uppercase">Price</label>
+                            <input 
+                                type="number"
+                                placeholder="999" 
+                                value={store.price}
+                                onChange={(e) => handleStoreChange(index, "price", e.target.value)}
+                                className="w-full border border-gray-300 p-2 rounded focus:outline-none focus:border-[#667eea]"
+                            />
+                        </div>
+                        <div className="flex-[2] w-full">
+                            <label className="block text-xs font-bold mb-1 text-gray-500 uppercase">URL Link</label>
+                            <input 
+                                placeholder="https://..." 
+                                value={store.url}
+                                onChange={(e) => handleStoreChange(index, "url", e.target.value)}
+                                className="w-full border border-gray-300 p-2 rounded focus:outline-none focus:border-[#667eea]"
+                            />
+                        </div>
+                        <button 
+                            type="button" 
+                            onClick={() => removeStore(index)}
+                            className="p-2 text-red-500 hover:bg-red-100 rounded transition-colors"
+                            title="Remove Store"
+                        >
+                            <FaTrash />
+                        </button>
+                    </div>
+                  ))}
+                </div>
+                <button 
+                    type="button" 
+                    onClick={addStore} 
+                    className="mt-3 text-sm font-bold text-[#667eea] flex items-center gap-2 hover:underline"
+                >
+                    <FaPlus /> Add Another Store Link
+                </button>
               </div>
 
               <div>

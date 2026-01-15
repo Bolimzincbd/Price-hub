@@ -37,13 +37,12 @@ const PhoneDetail = () => {
       .catch((error) => console.error("Error:", error));
   }, [id]);
 
-  // 2. Check Wishlist Status (Runs when user OR phone loads)
+  // 2. Check Wishlist Status
   useEffect(() => {
     if (user && phone?._id) {
         fetch(`http://localhost:5000/api/wishlist/${user.id}`)
             .then(res => res.json())
             .then(data => {
-                // FIX: Robust Comparison
                 const exists = data.some(item => {
                     const itemId = item.phoneId?._id || item.phoneId;
                     return String(itemId) === String(phone._id);
@@ -59,41 +58,32 @@ const PhoneDetail = () => {
     setTimeout(() => setToastMessage(""), 3000);
   };
 
-
   const toggleWishlist = async () => {
     if (!user) return showNotification("Please login to use wishlist");
     
-    // Optimistic update backup (to revert if failed)
     const previousState = inWishlist;
-    setInWishlist(!previousState); // Immediate UI feedback
+    setInWishlist(!previousState);
 
     try {
         let res;
         if (previousState) {
-            // Remove
             res = await fetch(`http://localhost:5000/api/wishlist/${user.id}/${phone._id}`, { method: "DELETE" });
         } else {
-            // Add
             res = await fetch(`http://localhost:5000/api/wishlist`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ userId: user.id, phoneId: phone._id })
             });
         }
-
-        if (!res.ok) {
-            throw new Error("Failed to update wishlist");
-        }
-
+        if (!res.ok) throw new Error("Failed to update wishlist");
         const data = await res.json();
         showNotification(previousState ? "Removed from Wishlist" : "Added to Wishlist");
-
     } catch (err) { 
         console.error(err); 
-        setInWishlist(previousState); // Revert on error
+        setInWishlist(previousState);
         showNotification("Error updating wishlist");
     }
-};
+  };
 
   const handleAddToCompare = () => {
     const currentList = JSON.parse(localStorage.getItem("compareList")) || [];
@@ -127,11 +117,7 @@ const PhoneDetail = () => {
                 comment: reviewForm.comment
             })
         });
-
-        // FIX: Check if request was successful
-        if (!res.ok) {
-            throw new Error("Failed to submit review");
-        }
+        if (!res.ok) throw new Error("Failed to submit review");
 
         const updatedPhone = await res.json();
         setPhone(updatedPhone);

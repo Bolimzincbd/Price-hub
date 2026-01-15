@@ -87,14 +87,10 @@ const UserDashboard = () => {
                 
                 return (
                     <div key={item._id} className="relative group">
-                        <button 
-                            onClick={() => removeFromWishlist(item._id)}
-                            className="absolute top-2 right-2 z-20 bg-red-500 text-white w-8 h-8 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600 shadow-md cursor-pointer"
-                            title="Remove from Wishlist"
-                        >
-                            ✕
-                        </button>
+                        {/* REMOVED: The red 'X' button was here */}
+                        
                         <div className="h-[420px]">
+                            {/* The Phonecard itself will handle interactions now */}
                             <Phonecard phone={item.phoneId} />
                         </div>
                     </div>
