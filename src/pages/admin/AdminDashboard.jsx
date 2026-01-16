@@ -141,7 +141,7 @@ const AdminDashboard = () => {
     e.preventDefault();
     const endpoint = activeTab === "phones" ? "phones" : "blogs";
     const bodyData = activeTab === "phones" ? phoneForm : blogForm;
-    const url = editingId ? `http://localhost:5000/api/${endpoint}/${editingId}` : `http://localhost:5000/api/${endpoint}`;
+    const url = editingId ? `${config.baseURL}/api/${endpoint}/${editingId}` : `${config.baseURL}/api/${endpoint}`;
     const method = editingId ? 'PUT' : 'POST';
 
     const res = await fetch(url, {
