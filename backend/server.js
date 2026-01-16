@@ -217,5 +217,10 @@ app.delete('/api/blogs/:id', async (req, res) => {
   }
 });
 
+// Add this Root Route
+app.get('/', (req, res) => {
+  res.send('PriceHub API is running successfully!');
+});
+
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
