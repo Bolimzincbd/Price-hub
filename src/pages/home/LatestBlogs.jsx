@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import config from '../../config';
 
 const LatestBlogs = () => {
   const [blogs, setBlogs] = useState([]);
 
   useEffect(() => {
-    fetch("http://localhost:5000/api/blogs")
+    fetch(`${config.baseURL}/api/blogs`)
       .then((res) => res.json())
       .then((data) => setBlogs(data.slice(0, 3))) // Only show top 3
       .catch((err) => console.error(err));

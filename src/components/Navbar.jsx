@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { FaSearch, FaUser, FaBars, FaTimes } from "react-icons/fa";
 import { SignedIn, SignedOut, SignInButton, UserButton, useUser } from "@clerk/clerk-react";
+import config from '../config';
 
 const Navbar = () => {
   const { user, isLoaded } = useUser();
@@ -23,7 +24,7 @@ const Navbar = () => {
         setIsAdmin(true);
       } else {
         // 2. Check Database for Sub-Admins
-        fetch("http://localhost:5000/api/admins")
+        fetch(`${config.baseURL}/api/admins`)
           .then((res) => res.json())
           .then((data) => {
             // Check if current email exists in the returned list

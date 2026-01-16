@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { getImgUrl } from "../../utils/getImgUrl";
 import { Link } from "react-router-dom";
+import config from '../../config';
 
 const Compare = () => {
   const [allPhones, setAllPhones] = useState([]);
@@ -10,7 +11,7 @@ const Compare = () => {
 
   // 1. Fetch all phones data on load (for the selection modal)
   useEffect(() => {
-    fetch("http://localhost:5000/api/phones")
+   fetch(`${config.baseURL}/api/phones`)
       .then((res) => res.json())
       .then((data) => setAllPhones(data))
       .catch((err) => console.error("Failed to load phones", err));

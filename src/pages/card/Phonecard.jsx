@@ -3,6 +3,7 @@ import { getImgUrl } from "../../utils/getImgUrl";
 import { Link } from "react-router-dom";
 import { FaHeart, FaRegHeart } from "react-icons/fa";
 import { useUser } from "@clerk/clerk-react";
+import config from '../../config';
 
 const Phonecard = ({ phone }) => {
   const { user } = useUser();
@@ -11,7 +12,7 @@ const Phonecard = ({ phone }) => {
   // Check if this phone is in wishlist on load
   useEffect(() => {
     if (user && phone?._id) {
-      fetch(`http://localhost:5000/api/wishlist/${user.id}`)
+      fetch(`${config.baseURL}/api/wishlist/${user.id}`)
         .then((res) => res.json())
         .then((data) => {
           const exists = data.some((item) => {

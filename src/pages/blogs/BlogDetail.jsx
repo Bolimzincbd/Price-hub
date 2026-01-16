@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { FaArrowLeft, FaCalendarAlt, FaUser } from "react-icons/fa";
+import config from '../../config';
 
 const BlogDetail = () => {
   const { id } = useParams();
@@ -8,7 +9,7 @@ const BlogDetail = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch(`http://localhost:5000/api/blogs/${id}`)
+    fetch(`${config.baseURL}/api/blogs/${id}`)
       .then((res) => res.json())
       .then((data) => {
         setBlog(data);

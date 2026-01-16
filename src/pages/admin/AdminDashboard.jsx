@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useUser } from "@clerk/clerk-react";
 import { Navigate } from "react-router-dom";
 import { FaEdit, FaTrash, FaPlus, FaTimes, FaUserShield, FaMobileAlt, FaNewspaper } from "react-icons/fa";
+import config from '../../config';
 
 const AdminDashboard = () => {
   const { user, isSignedIn, isLoaded } = useUser();
@@ -36,19 +37,19 @@ const AdminDashboard = () => {
     if (!isLoaded || !isSignedIn) return;
 
     // Fetch Phones
-    fetch("http://localhost:5000/api/phones")
+    fetch(`${config.baseURL}/api/phones`)
       .then(res => res.json())
       .then(data => setPhones(data))
       .catch(err => console.error("Phones Error:", err));
 
     // Fetch Blogs
-    fetch("http://localhost:5000/api/blogs")
+    fetch(`${config.baseURL}/api/blogs`)
       .then(res => res.json())
       .then(data => setBlogs(data))
       .catch(err => console.error("Blogs Error:", err));
 
     // Fetch Admins
-    fetch("http://localhost:5000/api/admins")
+    fetch(`${config.baseURL}/api/admins`)
       .then(res => res.json())
       .then(data => {
         setAdmins(data);
@@ -129,7 +130,7 @@ const AdminDashboard = () => {
   const handleDelete = async (id) => {
     if(window.confirm("Delete this item permanently?")) {
         const endpoint = activeTab === "phones" ? "phones" : "blogs";
-        await fetch(`http://localhost:5000/api/${endpoint}/${id}`, { method: 'DELETE' });
+        await fetch(`${config.baseURL}/api/${endpoint}/${id}`, { method: 'DELETE' });
         
         if (activeTab === "phones") setPhones(phones.filter(p => p._id !== id));
         if (activeTab === "blogs") setBlogs(blogs.filter(b => b._id !== id));
@@ -179,7 +180,7 @@ const AdminDashboard = () => {
     e.preventDefault();
     if (!newAdminEmail) return;
     try {
-        const res = await fetch("http://localhost:5000/api/admins", {
+        const res = await fetch(`${config.baseURL}/api/admins`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ email: newAdminEmail })
@@ -197,7 +198,7 @@ const AdminDashboard = () => {
 
   const handleRemoveAdmin = async (id) => {
     if (window.confirm("Remove access?")) {
-        await fetch(`http://localhost:5000/api/admins/${id}`, { method: 'DELETE' });
+        await fetch(`${config.baseURL}/api/admins/${id}`, { method: 'DELETE' });
         setAdmins(admins.filter(a => a._id !== id));
     }
   };

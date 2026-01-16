@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { useUser, RedirectToSignIn } from "@clerk/clerk-react";
 import { useNavigate } from "react-router-dom";
 import Phonecard from "../card/Phonecard";
+import config from '../../config';
+
 
 const UserDashboard = () => {
   const { isLoaded, isSignedIn, user } = useUser();
@@ -21,7 +23,7 @@ const UserDashboard = () => {
         }
 
         // 2. Check Sub Admin
-        fetch("http://localhost:5000/api/admins")
+        fetch(`${config.baseURL}/api/admins`)
             .then(res => res.json())
             .then(data => {
                 if (data.some(admin => admin.email === email)) {
@@ -35,7 +37,7 @@ const UserDashboard = () => {
   // --- FETCH WISHLIST ---
   useEffect(() => {
     if (user) {
-      fetch(`http://localhost:5000/api/wishlist/${user.id}`)
+      fetch(`${config.baseURL}/api/wishlist/${user.id}`)
         .then((res) => res.json())
         .then((data) => {
           setWishlist(data);
@@ -54,7 +56,7 @@ const UserDashboard = () => {
   const removeFromWishlist = async (wishlistItemId) => {
     if(!window.confirm("Remove this phone from wishlist?")) return;
     try {
-        const res = await fetch(`http://localhost:5000/api/wishlist/item/${wishlistItemId}`, { method: 'DELETE' });
+        const res = await fetch(`${config.baseURL}/api/wishlist/item/${wishlistItemId}`, { method: 'DELETE' });
         if (!res.ok) throw new Error("Failed to delete");
         setWishlist(wishlist.filter(item => item._id !== wishlistItemId));
     } catch (err) { console.error(err); alert("Failed to remove item."); }

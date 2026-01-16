@@ -10,6 +10,7 @@ import {
   FaStore, 
   FaCheckCircle 
 } from "react-icons/fa";
+import config from '../../config';
 
 const PhoneDetail = () => {
   const { id } = useParams();
@@ -28,7 +29,7 @@ const PhoneDetail = () => {
 
   // 1. Fetch Phone Data
   useEffect(() => {
-    fetch(`http://localhost:5000/api/phones/${id}`)
+    fetch(`${config.baseURL}/api/phones/${id}`)
       .then((res) => res.json())
       .then((data) => {
         setPhone(data);
@@ -40,7 +41,7 @@ const PhoneDetail = () => {
   // 2. Check Wishlist Status
   useEffect(() => {
     if (user && phone?._id) {
-        fetch(`http://localhost:5000/api/wishlist/${user.id}`)
+        fetch(`${config.baseURL}/api/wishlist/${user.id}`)
             .then(res => res.json())
             .then(data => {
                 const exists = data.some(item => {
@@ -67,9 +68,9 @@ const PhoneDetail = () => {
     try {
         let res;
         if (previousState) {
-            res = await fetch(`http://localhost:5000/api/wishlist/${user.id}/${phone._id}`, { method: "DELETE" });
+            res = await fetch(`${config.baseURL}/api/wishlist/${user.id}/${phone._id}`, { method: "DELETE" });
         } else {
-            res = await fetch(`http://localhost:5000/api/wishlist`, {
+            res = await fetch(`${config.baseURL}/api/wishlist`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ userId: user.id, phoneId: phone._id })
@@ -108,7 +109,7 @@ const PhoneDetail = () => {
     const userName = user.fullName || user.firstName || "Anonymous";
 
     try {
-        const res = await fetch(`http://localhost:5000/api/phones/${phone._id}/reviews`, {
+        const res = await fetch(`${config.baseURL}/api/phones/${phone._id}/reviews`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({

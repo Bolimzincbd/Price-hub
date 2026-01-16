@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import ScrollList from "../../components/ScrollList"; // Imported ScrollList
 import { FaFilter } from "react-icons/fa";
+import config from '../../config';
 
 const AllBrand = () => {
   const [phones, setPhones] = useState([]);
@@ -13,7 +14,7 @@ const AllBrand = () => {
   const [minRam, setMinRam] = useState(0);
 
   useEffect(() => {
-    fetch("http://localhost:5000/api/phones")
+    fetch(`${config.baseURL}/api/phones`)
       .then((res) => res.json())
       .then((data) => {
         // Safety check: ensure data is an array

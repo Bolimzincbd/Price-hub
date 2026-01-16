@@ -5,13 +5,14 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules"; // Only Navigation needed
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import "swiper/css";
+import config from '../../config';
 
 const Latest = () => {
   const [phones, setPhones] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("http://localhost:5000/api/phones")
+    fetch(`${config.baseURL}/api/phones`)
       .then((res) => res.json())
       .then((data) => {
         setPhones(data);

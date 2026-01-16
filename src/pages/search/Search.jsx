@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import Phonecard from "../card/Phonecard";
+import config from '../../config';
 
 const Search = () => {
   const [searchParams] = useSearchParams();
@@ -9,7 +10,7 @@ const Search = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("http://localhost:5000/api/phones")
+    fetch(`${config.baseURL}/api/phones`)
       .then((res) => res.json())
       .then((data) => {
         setPhones(data);
