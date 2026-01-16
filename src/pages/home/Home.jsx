@@ -3,7 +3,7 @@ import Banner from "./Banner";
 import Latest from "./Latest";
 import Recommend from "./Recommend";
 import Allbrand from "./AllBrand";
-
+import LatestBlogs from "./LatestBlogs"; // Import the new component
 
 const Home = () => {
   return (
@@ -12,6 +12,7 @@ const Home = () => {
       <Allbrand />
       <Latest />
       <Recommend />
+      <LatestBlogs /> {/* Added block below Recommend */}
     </>
   );
 };

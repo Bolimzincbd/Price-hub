@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
-const Phone = require("./models/Phone"); // Ensure this path is correct based on your folder structure
+const Phone = require("./models/Phone"); 
 const fs = require("fs");
 const path = require("path");
 
