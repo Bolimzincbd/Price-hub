@@ -7,8 +7,8 @@ const dotenv = require('dotenv');
 // Import Models
 const Phone = require('./models/Phone');
 const Wishlist = require('./models/Wishlist');
-// --- NEW: Import Admin Model ---
 const Admin = require('./models/Admin'); 
+const Blog = require('./models/Blog'); // <--- NEW IMPORT
 
 dotenv.config();
 const app = express();
@@ -134,9 +134,8 @@ app.delete('/api/wishlist/item/:id', async (req, res) => {
     }
 });
 
-// --- NEW: ADMIN ROLE ROUTES ---
+// --- ADMIN ROLE ROUTES ---
 
-// Get all Sub-Admins
 app.get('/api/admins', async (req, res) => {
   try {
     const admins = await Admin.find();
@@ -146,7 +145,6 @@ app.get('/api/admins', async (req, res) => {
   }
 });
 
-// Add a Sub-Admin
 app.post('/api/admins', async (req, res) => {
   try {
     const { email } = req.body;
@@ -161,11 +159,59 @@ app.post('/api/admins', async (req, res) => {
   }
 });
 
-// Remove a Sub-Admin
 app.delete('/api/admins/:id', async (req, res) => {
   try {
     await Admin.findByIdAndDelete(req.params.id);
     res.json({ message: "Admin removed" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// --- BLOG ROUTES (NEW) ---
+
+app.get('/api/blogs', async (req, res) => {
+  try {
+    const blogs = await Blog.find().sort({ createdAt: -1 });
+    res.json(blogs);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.get('/api/blogs/:id', async (req, res) => {
+  try {
+    const blog = await Blog.findById(req.params.id);
+    if (!blog) return res.status(404).json({ msg: 'Blog not found' });
+    res.json(blog);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post('/api/blogs', async (req, res) => {
+  try {
+    const newBlog = new Blog(req.body);
+    const savedBlog = await newBlog.save();
+    res.json(savedBlog);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+app.put('/api/blogs/:id', async (req, res) => {
+  try {
+    const updatedBlog = await Blog.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    res.json(updatedBlog);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+app.delete('/api/blogs/:id', async (req, res) => {
+  try {
+    await Blog.findByIdAndDelete(req.params.id);
+    res.json({ message: 'Blog deleted' });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

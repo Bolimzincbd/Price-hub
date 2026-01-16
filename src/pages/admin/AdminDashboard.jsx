@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useUser } from "@clerk/clerk-react";
 import { Navigate } from "react-router-dom";
-import { FaEdit, FaTrash, FaPlus, FaTimes, FaCamera, FaUserShield, FaMobileAlt } from "react-icons/fa";
+import { FaEdit, FaTrash, FaPlus, FaTimes, FaUserShield, FaMobileAlt, FaNewspaper } from "react-icons/fa";
 
 const AdminDashboard = () => {
   const { user, isSignedIn, isLoaded } = useUser();
@@ -9,42 +9,50 @@ const AdminDashboard = () => {
   // --- STATE ---
   const [activeTab, setActiveTab] = useState("phones");
   const [phones, setPhones] = useState([]);
+  const [blogs, setBlogs] = useState([]); // <--- NEW: Blogs State
   const [admins, setAdmins] = useState([]); 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [newAdminEmail, setNewAdminEmail] = useState("");
-  
-  // NEW: Track if we are checking permissions
   const [checkingAuth, setCheckingAuth] = useState(true);
 
-  // --- PERMISSION LOGIC ---
-  const MAIN_ADMIN_EMAIL = "mooneweea@gmail.com"; 
-  const userEmail = user?.primaryEmailAddress?.emailAddress;
-  const isMainAdmin = userEmail === MAIN_ADMIN_EMAIL;
-  // We calculate isSubAdmin later after fetching
-
-  const [formData, setFormData] = useState({
+  // --- FORM DATA STATE ---
+  const [phoneForm, setPhoneForm] = useState({
     name: "", price: "", category: "iphone", coverImage: "", 
     latest: true, recommend: false, description: "", year: "2024",
     specs: { display: "", processor: "", ram: "", storage: "", battery: "", camera: "" },
     stores: []
   });
 
+  const [blogForm, setBlogForm] = useState({
+    title: "", excerpt: "", content: "", category: "Technology", image: ""
+  });
+
+  const MAIN_ADMIN_EMAIL = "mooneweea@gmail.com"; 
+  const userEmail = user?.primaryEmailAddress?.emailAddress;
+  const isMainAdmin = userEmail === MAIN_ADMIN_EMAIL;
+
   useEffect(() => {
     if (!isLoaded || !isSignedIn) return;
 
-    // 1. Fetch Phones
+    // Fetch Phones
     fetch("http://localhost:5000/api/phones")
       .then(res => res.json())
       .then(data => setPhones(data))
       .catch(err => console.error("Phones Error:", err));
 
-    // 2. Fetch Admins & Update Loading State
+    // Fetch Blogs
+    fetch("http://localhost:5000/api/blogs")
+      .then(res => res.json())
+      .then(data => setBlogs(data))
+      .catch(err => console.error("Blogs Error:", err));
+
+    // Fetch Admins
     fetch("http://localhost:5000/api/admins")
       .then(res => res.json())
       .then(data => {
         setAdmins(data);
-        setCheckingAuth(false); // <--- STOP LOADING HERE
+        setCheckingAuth(false);
       })
       .catch(err => {
         console.error("Admins Error:", err);
@@ -52,7 +60,6 @@ const AdminDashboard = () => {
       });
   }, [isLoaded, isSignedIn]);
 
-  // --- LOADING GUARD ---
   if (!isLoaded || checkingAuth) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -61,8 +68,6 @@ const AdminDashboard = () => {
     );
   }
 
-  // --- ACCESS CHECK ---
-  // Now we check permissions safely because 'admins' is fully loaded
   const isSubAdmin = admins.some(a => a.email === userEmail);
   const hasAccess = isMainAdmin || isSubAdmin;
 
@@ -70,80 +75,106 @@ const AdminDashboard = () => {
     return <Navigate to="/dashboard" />;
   }
 
-  // --- HANDLERS (Same as before) ---
-  const handleOpenAdd = () => { setEditingId(null); setFormData({
-    name: "", price: "", category: "iphone", coverImage: "", 
-    latest: true, recommend: false, description: "", year: "2024",
-    specs: { display: "", processor: "", ram: "", storage: "", battery: "", camera: "" },
-    stores: []
-  }); setIsModalOpen(true); };
-  
-  const handleOpenEdit = (phone) => {
-    setEditingId(phone._id);
-    setFormData({
-      ...phone,
-      coverImage: phone.coverImage || "",
-      specs: { 
-        display: phone.specs?.display || "", 
-        processor: phone.specs?.processor || "", 
-        ram: phone.specs?.ram || "", 
-        storage: phone.specs?.storage || "", 
-        battery: phone.specs?.battery || "", 
-        camera: phone.specs?.camera || "" 
-      },
-      stores: phone.stores || []
-    });
+  // --- HANDLERS ---
+
+  const handleOpenAdd = () => {
+    setEditingId(null);
+    if (activeTab === "phones") {
+        setPhoneForm({
+            name: "", price: "", category: "iphone", coverImage: "", 
+            latest: true, recommend: false, description: "", year: "2024",
+            specs: { display: "", processor: "", ram: "", storage: "", battery: "", camera: "" },
+            stores: []
+        });
+    } else if (activeTab === "blogs") {
+        setBlogForm({ title: "", excerpt: "", content: "", category: "Technology", image: "" });
+    }
     setIsModalOpen(true);
   };
 
-  const handleDelete = async (id) => {
-    if(window.confirm("Delete this phone permanently?")) {
-        await fetch(`http://localhost:5000/api/phones/${id}`, { method: 'DELETE' });
-        setPhones(phones.filter(p => p._id !== id));
+  const handleOpenEdit = (item) => {
+    setEditingId(item._id);
+    if (activeTab === "phones") {
+        setPhoneForm({
+            ...item,
+            coverImage: item.coverImage || "",
+            specs: { 
+                display: item.specs?.display || "", 
+                processor: item.specs?.processor || "", 
+                ram: item.specs?.ram || "", 
+                storage: item.specs?.storage || "", 
+                battery: item.specs?.battery || "", 
+                camera: item.specs?.camera || "" 
+            },
+            stores: item.stores || []
+        });
+    } else if (activeTab === "blogs") {
+        setBlogForm(item);
     }
+    setIsModalOpen(true);
   };
 
-  const handleImageUpload = (e) => {
+  const handleImageUpload = (e, type) => {
     const file = e.target.files[0];
     if (file) {
       const reader = new FileReader();
-      reader.onloadend = () => setFormData({ ...formData, coverImage: reader.result });
+      reader.onloadend = () => {
+        if(type === 'phone') setPhoneForm({ ...phoneForm, coverImage: reader.result });
+        if(type === 'blog') setBlogForm({ ...blogForm, image: reader.result });
+      };
       reader.readAsDataURL(file);
     }
   };
 
-  const handleSpecChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, specs: { ...prev.specs, [name]: value } }));
+  const handleDelete = async (id) => {
+    if(window.confirm("Delete this item permanently?")) {
+        const endpoint = activeTab === "phones" ? "phones" : "blogs";
+        await fetch(`http://localhost:5000/api/${endpoint}/${id}`, { method: 'DELETE' });
+        
+        if (activeTab === "phones") setPhones(phones.filter(p => p._id !== id));
+        if (activeTab === "blogs") setBlogs(blogs.filter(b => b._id !== id));
+    }
   };
-
-  const handleStoreChange = (index, field, value) => {
-    const updatedStores = [...formData.stores];
-    updatedStores[index][field] = value;
-    setFormData({ ...formData, stores: updatedStores });
-  };
-  const addStore = () => setFormData({ ...formData, stores: [...formData.stores, { name: "", price: "", url: "" }] });
-  const removeStore = (index) => setFormData({ ...formData, stores: formData.stores.filter((_, i) => i !== index) });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const url = editingId ? `http://localhost:5000/api/phones/${editingId}` : 'http://localhost:5000/api/phones';
+    const endpoint = activeTab === "phones" ? "phones" : "blogs";
+    const bodyData = activeTab === "phones" ? phoneForm : blogForm;
+    const url = editingId ? `http://localhost:5000/api/${endpoint}/${editingId}` : `http://localhost:5000/api/${endpoint}`;
     const method = editingId ? 'PUT' : 'POST';
 
     const res = await fetch(url, {
       method,
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(formData)
+      body: JSON.stringify(bodyData)
     });
 
     if (res.ok) {
-        const savedPhone = await res.json();
-        setPhones(editingId ? phones.map(p => p._id === editingId ? savedPhone : p) : [...phones, savedPhone]);
+        const savedItem = await res.json();
+        if (activeTab === "phones") {
+            setPhones(editingId ? phones.map(p => p._id === editingId ? savedItem : p) : [...phones, savedItem]);
+        } else {
+            setBlogs(editingId ? blogs.map(b => b._id === editingId ? savedItem : b) : [...blogs, savedItem]);
+        }
         setIsModalOpen(false);
-        alert("Success!");
     }
   };
 
+  // --- PHONE STORE HANDLERS ---
+  const handleStoreChange = (index, field, value) => {
+    const updatedStores = [...phoneForm.stores];
+    updatedStores[index][field] = value;
+    setPhoneForm({ ...phoneForm, stores: updatedStores });
+  };
+  const addStore = () => setPhoneForm({ ...phoneForm, stores: [...phoneForm.stores, { name: "", price: "", url: "" }] });
+  const removeStore = (index) => setPhoneForm({ ...phoneForm, stores: phoneForm.stores.filter((_, i) => i !== index) });
+  
+  const handleSpecChange = (e) => {
+    const { name, value } = e.target;
+    setPhoneForm(prev => ({ ...prev, specs: { ...prev.specs, [name]: value } }));
+  };
+
+  // --- ADMIN HANDLERS ---
   const handleAddAdmin = async (e) => {
     e.preventDefault();
     if (!newAdminEmail) return;
@@ -182,7 +213,6 @@ const AdminDashboard = () => {
         </div>
         
         <nav className="flex-1 p-4 space-y-2">
-            {/* TAB 1: MANAGE PHONES (Visible to Everyone) */}
             <button 
                 onClick={() => setActiveTab("phones")}
                 className={`w-full text-left p-3 rounded-lg font-medium flex items-center gap-3 transition-colors ${activeTab === "phones" ? "bg-[#667eea] text-white" : "text-gray-400 hover:bg-gray-800"}`}
@@ -190,7 +220,14 @@ const AdminDashboard = () => {
                 <FaMobileAlt /> Manage Phones
             </button>
 
-            {/* TAB 2: MANAGE ROLES (Visible ONLY to Main Admin) */}
+            {/* NEW BLOG TAB */}
+            <button 
+                onClick={() => setActiveTab("blogs")}
+                className={`w-full text-left p-3 rounded-lg font-medium flex items-center gap-3 transition-colors ${activeTab === "blogs" ? "bg-[#667eea] text-white" : "text-gray-400 hover:bg-gray-800"}`}
+            >
+                <FaNewspaper /> Manage Blogs
+            </button>
+
             {isMainAdmin && (
                 <button 
                     onClick={() => setActiveTab("roles")}
@@ -241,12 +278,40 @@ const AdminDashboard = () => {
             </div>
         )}
 
+        {/* VIEW: MANAGE BLOGS (NEW) */}
+        {activeTab === "blogs" && (
+            <div>
+                <div className="flex justify-between items-center mb-8">
+                    <h1 className="text-3xl font-bold text-gray-800">Blog Management</h1>
+                    <button onClick={handleOpenAdd} className="bg-green-500 hover:bg-green-600 text-white px-6 py-2.5 rounded-lg flex items-center gap-2 font-bold shadow-md">
+                      <FaPlus /> Add New Blog
+                    </button>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {blogs.map((blog) => (
+                        <div key={blog._id} className="bg-white rounded-xl shadow border p-4 flex flex-col">
+                            {blog.image && <img src={blog.image} className="h-32 w-full object-cover rounded mb-3" alt="blog"/>}
+                            <h3 className="font-bold text-lg mb-1">{blog.title}</h3>
+                            <p className="text-sm text-gray-500 line-clamp-2 mb-4 flex-1">{blog.excerpt}</p>
+                            <div className="flex justify-between mt-auto pt-3 border-t">
+                                <span className="text-xs bg-gray-100 px-2 py-1 rounded">{blog.category}</span>
+                                <div className="flex gap-3">
+                                    <button onClick={() => handleOpenEdit(blog)} className="text-blue-500"><FaEdit /></button>
+                                    <button onClick={() => handleDelete(blog._id)} className="text-red-500"><FaTrash /></button>
+                                </div>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        )}
+
         {/* VIEW: MANAGE ROLES (Only Main Admin) */}
         {activeTab === "roles" && isMainAdmin && (
             <div className="max-w-4xl mx-auto">
                  <h1 className="text-3xl font-bold text-gray-800 mb-8">Manage Admin Access</h1>
                  
-                 {/* Add Admin */}
                  <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200 mb-8">
                     <h3 className="font-bold mb-4">Add New Admin</h3>
                     <form onSubmit={handleAddAdmin} className="flex gap-4">
@@ -255,7 +320,6 @@ const AdminDashboard = () => {
                     </form>
                  </div>
 
-                 {/* List Admins */}
                  <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
                     <div className="p-2 font-bold bg-blue-50 mb-2 rounded text-blue-800">You (Super Admin): {MAIN_ADMIN_EMAIL}</div>
                     {admins.map((admin) => (
@@ -274,39 +338,91 @@ const AdminDashboard = () => {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
           <div className="bg-white rounded-2xl p-8 w-full max-w-3xl relative h-[90vh] overflow-y-auto">
             <button onClick={() => setIsModalOpen(false)} className="absolute top-4 right-4"><FaTimes size={24}/></button>
-            <h2 className="text-2xl font-bold mb-6">{editingId ? "Edit Phone" : "Add Phone"}</h2>
+            <h2 className="text-2xl font-bold mb-6">{editingId ? "Edit" : "Add New"}</h2>
             <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                    <input placeholder="Name" className="border p-2 rounded" value={formData.name} onChange={e=>setFormData({...formData, name: e.target.value})} required/>
-                    <input placeholder="Price" type="number" className="border p-2 rounded" value={formData.price} onChange={e=>setFormData({...formData, price: e.target.value})} required/>
-                </div>
-                <select className="w-full border p-2 rounded" value={formData.category} onChange={e => setFormData({...formData, category: e.target.value})}>
-                    <option value="iphone">iPhone</option>
-                    <option value="samsung">Samsung</option>
-                    <option value="oneplus">OnePlus</option>
-                </select>
                 
-                {/* Store Links Section */}
-                <div className="border p-4 rounded bg-gray-50">
-                    <h3 className="font-bold mb-2">Store Links</h3>
-                    {formData.stores.map((store, index) => (
-                        <div key={index} className="flex gap-2 mb-2">
-                            <input placeholder="Store Name" value={store.name} onChange={(e) => handleStoreChange(index, "name", e.target.value)} className="border p-2 rounded w-1/3" />
-                            <input placeholder="Price" value={store.price} onChange={(e) => handleStoreChange(index, "price", e.target.value)} className="border p-2 rounded w-1/4" />
-                            <input placeholder="URL" value={store.url} onChange={(e) => handleStoreChange(index, "url", e.target.value)} className="border p-2 rounded flex-1" />
-                            <button type="button" onClick={() => removeStore(index)} className="text-red-500"><FaTrash /></button>
+                {/* --- PHONE FORM FIELDS --- */}
+                {activeTab === "phones" && (
+                    <>
+                        <div className="grid grid-cols-2 gap-4">
+                            <input placeholder="Name" className="border p-2 rounded" value={phoneForm.name} onChange={e=>setPhoneForm({...phoneForm, name: e.target.value})} required/>
+                            <input placeholder="Price" type="number" className="border p-2 rounded" value={phoneForm.price} onChange={e=>setPhoneForm({...phoneForm, price: e.target.value})} required/>
                         </div>
-                    ))}
-                    <button type="button" onClick={addStore} className="text-blue-600 font-bold text-sm">+ Add Store</button>
-                </div>
+                        <select className="w-full border p-2 rounded" value={phoneForm.category} onChange={e => setPhoneForm({...phoneForm, category: e.target.value})}>
+                            <option value="iphone">iPhone</option>
+                            <option value="samsung">Samsung</option>
+                            <option value="oneplus">OnePlus</option>
+                        </select>
+                        
+                        <div className="border p-4 rounded bg-gray-50">
+                            <h3 className="font-bold mb-2">Store Links</h3>
+                            {phoneForm.stores.map((store, index) => (
+                                <div key={index} className="flex gap-2 mb-2">
+                                    <input placeholder="Store Name" value={store.name} onChange={(e) => handleStoreChange(index, "name", e.target.value)} className="border p-2 rounded w-1/3" />
+                                    <input placeholder="Price" value={store.price} onChange={(e) => handleStoreChange(index, "price", e.target.value)} className="border p-2 rounded w-1/4" />
+                                    <input placeholder="URL" value={store.url} onChange={(e) => handleStoreChange(index, "url", e.target.value)} className="border p-2 rounded flex-1" />
+                                    <button type="button" onClick={() => removeStore(index)} className="text-red-500"><FaTrash /></button>
+                                </div>
+                            ))}
+                            <button type="button" onClick={addStore} className="text-blue-600 font-bold text-sm">+ Add Store</button>
+                        </div>
 
-                <div className="grid grid-cols-2 gap-2">
-                  {Object.keys(formData.specs).map(key => (
-                    <input key={key} placeholder={key} className="border p-2 rounded" value={formData.specs[key]} onChange={handleSpecChange} name={key} />
-                  ))}
-                </div>
-                <textarea placeholder="Description" className="w-full border p-2 rounded" rows="3" value={formData.description} onChange={e=>setFormData({...formData, description: e.target.value})} />
-                <input type="file" onChange={handleImageUpload} />
+                        <div className="grid grid-cols-2 gap-2">
+                          {Object.keys(phoneForm.specs).map(key => (
+                            <input key={key} placeholder={key} className="border p-2 rounded" value={phoneForm.specs[key]} onChange={handleSpecChange} name={key} />
+                          ))}
+                        </div>
+                        <textarea placeholder="Description" className="w-full border p-2 rounded" rows="3" value={phoneForm.description} onChange={e=>setPhoneForm({...phoneForm, description: e.target.value})} />
+                        <div className="border p-4 rounded border-dashed">
+                            <p className="mb-2 font-bold">Cover Image</p>
+                            <input type="file" onChange={(e) => handleImageUpload(e, 'phone')} />
+                            {phoneForm.coverImage && <img src={phoneForm.coverImage} className="h-20 mt-2 rounded" alt="preview" />}
+                        </div>
+                    </>
+                )}
+
+                {/* --- BLOG FORM FIELDS (NEW) --- */}
+                {activeTab === "blogs" && (
+                    <>
+                        <input 
+                            placeholder="Blog Title" 
+                            className="border p-2 rounded w-full font-bold" 
+                            value={blogForm.title} 
+                            onChange={e=>setBlogForm({...blogForm, title: e.target.value})} 
+                            required
+                        />
+                        <select 
+                            className="border p-2 rounded w-full"
+                            value={blogForm.category}
+                            onChange={e=>setBlogForm({...blogForm, category: e.target.value})}
+                        >
+                            <option>Technology</option>
+                            <option>Reviews</option>
+                            <option>Guides</option>
+                            <option>News</option>
+                        </select>
+                        <textarea 
+                            placeholder="Short Excerpt (Summary)" 
+                            className="border p-2 rounded w-full h-20" 
+                            value={blogForm.excerpt} 
+                            onChange={e=>setBlogForm({...blogForm, excerpt: e.target.value})} 
+                            required
+                        />
+                        <textarea 
+                            placeholder="Full Content (Standard Blog Text)" 
+                            className="border p-2 rounded w-full h-64" 
+                            value={blogForm.content} 
+                            onChange={e=>setBlogForm({...blogForm, content: e.target.value})} 
+                            required
+                        />
+                        <div className="border p-4 rounded border-dashed">
+                             <p className="mb-2 font-bold">Blog Thumbnail Image</p>
+                             <input type="file" onChange={(e) => handleImageUpload(e, 'blog')} />
+                             {blogForm.image && <img src={blogForm.image} alt="preview" className="h-20 mt-2 rounded" />}
+                        </div>
+                    </>
+                )}
+
                 <button type="submit" className="w-full bg-[#667eea] text-white p-3 rounded font-bold">Save</button>
             </form>
           </div>

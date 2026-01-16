@@ -6,10 +6,11 @@ import Compare from "../pages/compare/Compare";
 import Login from "../pages/Auth/Login";
 import Signup from "../pages/Auth/SignUp";
 import PhoneDetail from "../pages/phones/PhoneDetail";
-import AdminDashboard from "../pages/admin/AdminDashboard"; // Import Admin Page
+import AdminDashboard from "../pages/admin/AdminDashboard";
 import Search from "../pages/search/Search";
 import AllPhones from "../pages/home/Allphones";
 import UserDashboard from "../pages/user/UserDashboard";
+import BlogDetail from "../pages/blogs/BlogDetail"; // <--- IMPORT THIS
 
 const router = createBrowserRouter([
   {
@@ -24,18 +25,11 @@ const router = createBrowserRouter([
       { path: "/phones/:id", element: <PhoneDetail/> },
       { path: "/search", element: <Search /> },
       { path: "/phones", element: <AllPhones /> },
+      { path: "/admin-dashboard", element: <AdminDashboard/> },
+      { path: "/dashboard", element: <UserDashboard /> },
       
-      // Add the Admin Route here
-      { 
-        path: "/admin-dashboard", 
-        element: <AdminDashboard/> 
-      },
-
-      {
-        path: "/dashboard",
-        element: <UserDashboard />
-      }
-
+      // NEW BLOG ROUTE
+      { path: "/blogs/:id", element: <BlogDetail /> },
     ],
   },
 ]);
